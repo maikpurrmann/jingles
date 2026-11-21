@@ -53,15 +53,20 @@ private struct JinglesView: View {
             }
             HStack(spacing: 12) {
                 Button {
-                    player.toggle()
+                    player.play()
                 } label: {
-                    Label(player.isPlaying ? "Pause" : "Abspielen",
-                          systemImage: player.isPlaying ? "pause.fill" : "play.fill")
-                        .frame(minWidth: 95)
+                    Label("Abspielen", systemImage: "play.fill")
                 }
                 .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .disabled(!player.canToggle)
+                .disabled(!player.canPlay)
+                Button(action: player.pause) {
+                    Label("Pause", systemImage: "pause.fill")
+                }
+                .disabled(!player.canPause)
+                Button(action: player.stop) {
+                    Label("Stopp", systemImage: "stop.fill")
+                }
+                .disabled(!player.canStop)
                 if let name = player.currentFilename {
                     Text(name)
                         .foregroundStyle(.secondary)
@@ -69,6 +74,7 @@ private struct JinglesView: View {
                         .truncationMode(.middle)
                 }
             }
+            .controlSize(.large)
             if let message = player.message {
                 Text(message)
                     .font(.callout)

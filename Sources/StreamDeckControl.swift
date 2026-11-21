@@ -2,12 +2,13 @@ import Foundation
 import Network
 
 enum PlaybackResult {
-    case playing, paused, noFile, missingFile, unavailable
+    case playing, paused, stopped, noFile, missingFile, unavailable
 
     var response: (status: String, body: String) {
         switch self {
         case .playing: ("200 OK", "playing")
         case .paused: ("200 OK", "paused")
+        case .stopped: ("200 OK", "stopped")
         case .noFile: ("409 Conflict", "no jingle selected")
         case .missingFile: ("404 Not Found", "jingle not found")
         case .unavailable: ("503 Service Unavailable", "playback unavailable")

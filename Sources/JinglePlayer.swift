@@ -3,15 +3,21 @@ import AVFoundation
 import SwiftUI
 
 final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
+    private enum PlaybackState {
+        case stopped, playing, paused
+    }
+
     @Published private(set) var folder: URL?
     @Published private(set) var files: [URL] = []
     @Published private(set) var currentFilename: String?
-    @Published private(set) var isPlaying = false
+    @Published private var state: PlaybackState = .stopped
     @Published private(set) var message: String?
     @Published private(set) var playbackError: String?
     @Published private(set) var remoteError: String?
 
-    var canToggle: Bool { currentFilename != nil || !files.isEmpty }
+    var canPlay: Bool { state != .playing && (currentFilename != nil || !files.isEmpty) }
+    var canPause: Bool { state == .playing }
+    var canStop: Bool { state != .stopped }
 
     private let folderKey = "jingleFolderPath"
     private let filenameKey = "lastJingleFilename"
@@ -37,7 +43,7 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
             guard let self else { return .unavailable }
             switch command {
             case .toggle: return self.toggle()
-            case .play(let name): return self.play(named: name)
+            case .play(let name): return self.toggle(named: name)
             }
         }, failed: { [weak self] message in
             self?.remoteError = message
@@ -81,14 +87,18 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         }
     }
 
-    @discardableResult
     func toggle() -> PlaybackResult {
+        if canPause {
+            pause()
+            return .paused
+        }
+        return play()
+    }
+
+    @discardableResult
+    func play() -> PlaybackResult {
+        if canPause { return .playing }
         if let audio {
-            if audio.isPlaying {
-                audio.pause()
-                isPlaying = false
-                return .paused
-            }
             return resume(audio)
         }
         if let currentFilename {
@@ -97,6 +107,25 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         refresh()
         guard let first = files.first else { return .noFile }
         return play(named: first.lastPathComponent)
+    }
+
+    func pause() {
+        guard canPause, let audio else { return }
+        audio.pause()
+        state = .paused
+    }
+
+    func stop() {
+        clearPlayback()
+        playbackError = nil
+    }
+
+    private func toggle(named name: String) -> PlaybackResult {
+        if canPause, currentFilename == name {
+            stop()
+            return .stopped
+        }
+        return play(named: name)
     }
 
     @discardableResult
@@ -147,16 +176,21 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     }
 
     private func resume(_ player: AVAudioPlayer) -> PlaybackResult {
-        isPlaying = player.play()
-        playbackError = isPlaying ? nil : "Die Wiedergabe konnte nicht gestartet werden."
-        return isPlaying ? .playing : .unavailable
+        guard player.play() else {
+            clearPlayback()
+            playbackError = "Die Wiedergabe konnte nicht gestartet werden."
+            return .unavailable
+        }
+        state = .playing
+        playbackError = nil
+        return .playing
     }
 
     private func clearPlayback() {
         audio?.delegate = nil
         audio?.stop()
         audio = nil
-        isPlaying = false
+        state = .stopped
     }
 
     private func listAudioFiles(in folder: URL) throws -> [URL] {

@@ -12,7 +12,6 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     @Published private(set) var durations: [URL: Int] = [:]
     @Published private(set) var currentFilename: String?
     @Published private(set) var remainingSeconds: Int?
-    @Published private(set) var playbackProgress = 0.0
     @Published private var nextFilename: String?
     @Published private var state: PlaybackState = .stopped
     @Published private(set) var message: String?
@@ -26,6 +25,10 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     }
     var canPause: Bool { state == .playing }
     var canStop: Bool { state != .stopped }
+    var playbackProgress: Double {
+        guard let audio, audio.duration.isFinite, audio.duration > 0 else { return 0 }
+        return min(max(0, audio.currentTime / audio.duration), 1)
+    }
 
     private let folderKey = "jingleFolderPath"
     private let filenameKey = "lastJingleFilename"
@@ -145,7 +148,7 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         audio.pause()
         countdownTimer?.invalidate()
         countdownTimer = nil
-        updatePlaybackTime()
+        updateRemainingTime()
         state = .paused
     }
 
@@ -219,9 +222,9 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         }
         state = .playing
         playbackError = nil
-        updatePlaybackTime()
+        updateRemainingTime()
         let timer = Timer(timeInterval: 0.1, repeats: true) { [weak self] _ in
-            self?.updatePlaybackTime()
+            self?.updateRemainingTime()
         }
         RunLoop.main.add(timer, forMode: .common)
         countdownTimer = timer
@@ -235,21 +238,14 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         audio?.stop()
         audio = nil
         remainingSeconds = nil
-        playbackProgress = 0
         state = .stopped
     }
 
-    private func updatePlaybackTime() {
+    private func updateRemainingTime() {
         guard let audio else { return }
-        let duration = audio.duration
-        let elapsed = audio.currentTime
-        let remaining = Self.displaySeconds(max(0, duration - elapsed))
+        let remaining = Self.displaySeconds(max(0, audio.duration - audio.currentTime))
         if remainingSeconds != remaining {
             remainingSeconds = remaining
-        }
-        let progress = duration.isFinite && duration > 0 ? min(max(0, elapsed / duration), 1) : 0
-        if playbackProgress != progress {
-            playbackProgress = progress
         }
     }
 

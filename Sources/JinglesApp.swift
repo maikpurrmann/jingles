@@ -91,8 +91,10 @@ private struct JinglesView: View {
                 .labelStyle(.iconOnly)
                 .controlSize(.large)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                ProgressView(value: player.playbackProgress)
-                    .accessibilityLabel("Wiedergabefortschritt")
+                TimelineView(.animation(paused: !player.canPause)) { _ in
+                    ProgressView(value: player.playbackProgress)
+                        .accessibilityLabel("Wiedergabefortschritt")
+                }
             }
             if let message = player.message {
                 Text(message)

@@ -15,7 +15,7 @@ mkdir -p "$app/Contents/MacOS"
 cp Info.plist "$app/Contents/Info.plist"
 /usr/bin/swiftc -O -swift-version 5 -parse-as-library \
     -target "$(uname -m)-apple-macosx13.0" \
-    Sources/JinglesApp.swift Sources/StreamDeckControl.swift -o "$app/Contents/MacOS/Jingles"
+    Sources/*.swift -o "$app/Contents/MacOS/Jingles"
 /usr/bin/codesign --force --sign - "$app"
 /usr/bin/codesign --verify --strict "$app"
 if (( $# )); then

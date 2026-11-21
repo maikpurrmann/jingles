@@ -1,7 +1,5 @@
 import AppKit
-import AVFoundation
 import SwiftUI
-import UniformTypeIdentifiers
 
 @main
 struct JinglesApp: App {
@@ -9,121 +7,112 @@ struct JinglesApp: App {
 
     var body: some Scene {
         Window("Jingles", id: "player") {
-            VStack(alignment: .leading, spacing: 20) {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("Jingles")
-                        .font(.system(size: 32, weight: .semibold))
-                    Text(player.filename ?? "Keine WAV ausgewählt")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                        .help(player.filename ?? "")
-                }
-                HStack(spacing: 12) {
-                    Button {
-                        player.toggle()
-                    } label: {
-                        Label(player.isPlaying ? "Pause" : "Abspielen",
-                              systemImage: player.isPlaying ? "pause.fill" : "play.fill")
-                            .frame(minWidth: 95)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
-                    .disabled(player.filename == nil)
-                    Button("WAV auswählen …", action: player.chooseFile)
-                        .controlSize(.large)
-                }
-                if let error = player.playbackError {
-                    Text(error)
-                        .font(.callout)
-                        .foregroundStyle(.red)
-                }
-                if let error = player.remoteError {
-                    Text(error)
-                        .font(.callout)
-                        .foregroundStyle(.red)
-                }
-            }
-            .padding(26)
-            .frame(width: 360, alignment: .leading)
+            JinglesView(player: player)
         }
-        .windowResizability(.contentSize)
+        .defaultSize(width: 620, height: 470)
+        .windowResizability(.contentMinSize)
     }
 }
 
-final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
-    @Published private(set) var filename: String?
-    @Published private(set) var isPlaying = false
-    @Published private(set) var playbackError: String?
-    @Published private(set) var remoteError: String?
+private struct JinglesView: View {
+    @ObservedObject var player: JinglePlayer
 
-    private let fileKey = "wavePath"
-    private let remote = StreamDeckControl()
-    private var audio: AVAudioPlayer?
-
-    override init() {
-        super.init()
-        if let path = UserDefaults.standard.string(forKey: fileKey) {
-            load(URL(fileURLWithPath: path))
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("Jingles")
+                        .font(.system(size: 32, weight: .semibold))
+                    Text(player.folder?.lastPathComponent ?? "Kein Ordner ausgewählt")
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .help(player.folder?.path ?? "")
+                }
+                Spacer()
+                Button(action: player.refresh) {
+                    Label("Aktualisieren", systemImage: "arrow.clockwise")
+                }
+                .labelStyle(.iconOnly)
+                .help("Ordner aktualisieren")
+                .disabled(player.folder == nil)
+                Button("Ordner auswählen …", action: player.chooseFolder)
+            }
+            if player.files.isEmpty {
+                Spacer(minLength: 40)
+                Text(player.folder == nil
+                     ? "Wähle einen Ordner mit WAV- oder MP3-Dateien."
+                     : "In diesem Ordner sind keine WAV- oder MP3-Dateien.")
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                Spacer(minLength: 40)
+            } else {
+                List(player.files, id: \.self) { file in
+                    jingleRow(file)
+                }
+                .listStyle(.bordered)
+            }
+            HStack(spacing: 12) {
+                Button {
+                    player.toggle()
+                } label: {
+                    Label(player.isPlaying ? "Pause" : "Abspielen",
+                          systemImage: player.isPlaying ? "pause.fill" : "play.fill")
+                        .frame(minWidth: 95)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .disabled(!player.canToggle)
+                if let name = player.currentFilename {
+                    Text(name)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+            }
+            if let message = player.message {
+                Text(message)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+            if let error = player.playbackError {
+                Text(error)
+                    .font(.callout)
+                    .foregroundStyle(.red)
+            }
+            if let error = player.remoteError {
+                Text(error)
+                    .font(.callout)
+                    .foregroundStyle(.red)
+            }
         }
-        remote.start(toggle: { [weak self] in
-            self?.toggle() ?? .unavailable
-        }, failed: { [weak self] message in
-            self?.remoteError = message
-        })
+        .padding(22)
+        .frame(minWidth: 500, minHeight: 330)
     }
 
-    func chooseFile() {
-        let panel = NSOpenPanel()
-        panel.allowedContentTypes = [.wav]
-        panel.allowsMultipleSelection = false
-        panel.canChooseDirectories = false
-        if panel.runModal() == .OK, let url = panel.url {
-            load(url)
+    private func jingleRow(_ file: URL) -> some View {
+        let name = file.lastPathComponent
+        return HStack(spacing: 12) {
+            Button {
+                player.play(named: name)
+            } label: {
+                Image(systemName: "play.fill")
+            }
+            .help("„\(name)“ von Anfang an abspielen")
+            .accessibilityLabel("„\(name)“ abspielen")
+            Text(name)
+                .lineLimit(1)
+                .truncationMode(.middle)
+                .help(name)
+            Spacer()
+            Button {
+                player.copyStreamDeckLink(for: name)
+            } label: {
+                Label("Link kopieren", systemImage: "link")
+            }
+            .help("Stream-Deck-Link für „\(name)“ kopieren")
+            .accessibilityLabel("Stream-Deck-Link für „\(name)“ kopieren")
         }
-    }
-
-    private func load(_ url: URL) {
-        do {
-            let next = try AVAudioPlayer(contentsOf: url)
-            next.delegate = self
-            audio?.stop()
-            audio = next
-            isPlaying = false
-            filename = url.lastPathComponent
-            playbackError = nil
-            UserDefaults.standard.set(url.path, forKey: fileKey)
-        } catch {
-            playbackError = "Die WAV „\(url.lastPathComponent)“ konnte nicht geöffnet werden."
-        }
-    }
-
-    @discardableResult
-    func toggle() -> PlaybackResult {
-        guard let audio else { return .noFile }
-        if audio.isPlaying {
-            audio.pause()
-            isPlaying = false
-            return .paused
-        }
-        isPlaying = audio.play()
-        playbackError = isPlaying ? nil : "Die Wiedergabe konnte nicht gestartet werden."
-        return isPlaying ? .playing : .unavailable
-    }
-
-    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        guard player === audio else { return }
-        player.currentTime = 0
-        isPlaying = false
-        if !flag {
-            playbackError = "Die Wiedergabe wurde unterbrochen."
-        }
-    }
-
-    func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {
-        guard player === audio else { return }
-        isPlaying = false
-        playbackError = "Die WAV konnte nicht fertig abgespielt werden."
+        .buttonStyle(.borderless)
+        .padding(.vertical, 3)
     }
 }

@@ -1,6 +1,6 @@
 # Jingles
 
-Kleiner macOS-Prototyp für Planlosgelöst. Jingles merkt sich eine WAV-Datei und spielt sie über die aktuelle macOS-Tonausgabe ab. Dieselbe Taste pausiert die Wiedergabe und setzt sie an der gleichen Stelle fort.
+Kleiner macOS-Prototyp für Planlosgelöst. In **Jingles** einmal einen Ordner auswählen. Die App zeigt dessen WAV- und MP3-Dateien an und spielt immer eine Datei über die aktuelle macOS-Tonausgabe ab. Über **Aktualisieren** liest sie den Ordner erneut ein. Unterordner bleiben außen vor.
 
 ## App bauen und öffnen
 
@@ -14,10 +14,12 @@ Der Build verwendet die macOS-Command-Line-Tools von Apple. Die lokal signierte 
 ## Stream Deck
 
 1. Einer freien Taste **System → Webseite** zuweisen.
-2. Als URL `http://127.0.0.1:17639/toggle` eintragen und **GET-Anfrage im Hintergrund** auswählen.
-3. Jingles öffnen, eine WAV auswählen und das Fenster minimieren. Die Taste abwechselnd für Wiedergabe und Pause drücken.
+2. In Jingles neben dem gewünschten Einspieler **Link kopieren** wählen und den Link als URL einfügen.
+3. **GET-Anfrage im Hintergrund** auswählen. Ein Tastendruck startet genau diesen Einspieler von Anfang an, auch wenn Jingles minimiert ist.
 
-Die App muss dabei laufen. Maiks Taste **Jingles** liegt auf dem Stream Deck XL auf **Seite 4, zweite Reihe, vorletzte Spalte**. Play, Pause und Fortsetzen mit Jingles im Hintergrund sind geprüft. Für einen lokalen Test ohne Stream Deck gibt der gleiche Aufruf den neuen Zustand zurück.
+Der Link verweist auf den Dateinamen im ausgewählten Ordner. Weitere Dateien und eine geänderte Sortierung beeinflussen ihn nicht. Bei einer gleichnamigen Ersatzdatei liest die App beim Neustart des Einspielers die neue Fassung. Nach einem Umbenennen, Löschen oder Ändern der Endung meldet die App die fehlende Datei. Nach einem Umbenennen den neuen Link kopieren.
+
+Die App muss dabei laufen. Maiks vorhandene Taste **Jingles** auf **Seite 4, zweite Reihe, vorletzte Spalte** verwendet weiterhin den folgenden Link für Play/Pause und setzt an derselben Stelle fort. Nach dem Öffnen verwendet sie den letzten Einspieler oder, bei einem neu ausgewählten Ordner, den ersten Eintrag.
 
 ```sh
 curl -fsS http://127.0.0.1:17639/toggle
@@ -25,7 +27,7 @@ curl -fsS http://127.0.0.1:17639/toggle
 
 ## OBS
 
-1. Jingles öffnen und die WAV kurz abspielen.
+1. Jingles öffnen und einen Einspieler kurz abspielen.
 2. In OBS **macOS-Audioaufnahme → Anwendungsaudioaufnahme → Jingles** als eigene Quelle wählen.
 3. Für die separate Jingle-Aufnahme die Quelle **Spur 3** zuordnen, bei Bedarf zusätzlich **Spur 1** für den Abhörmix. **Spur 2** ist für das Mikrofon vorgesehen.
 4. Jingles beenden und am selben Installationsort neu öffnen. Abspielen und prüfen, ob die vorhandene OBS-Quelle wieder ausschlägt. Eine kurze MKV-Probe zeigt, ob die Spurzuordnung stimmt.
@@ -37,5 +39,6 @@ Für den Kopfhörer am Audient iD14 das Audient als macOS-Tonausgabe verwenden. 
 ## Teststand vom 21.11.2026
 
 - OBS hat die App nach einem Jingles-Neustart wiedererkannt. Maiks MKV-Probe bestätigt **Spur 1 Abhörmix**, **Spur 2 Mikrofon** und **Spur 3 Jingles**.
+- Mit der Ordnerliste wurden `01_PLG_Intro.wav` und `02_PLG_Outro.mp3` über ihre Einzel-Links gestartet. Beide Einspieler sind in der OBS-Probe auf **Spur 3** nachweisbar. Die physischen Tasten für die Einzel-Links stehen noch zur Probe an.
 - Maik hat die WAV über VDO.Ninja auf seinem MacBook als Gegenstelle gehört. Der gemeinsame Hörtest mit Christian ist offen.
 - Das Absenken auf **10 %** und der langsame Fade zurück auf **100 %** sind noch offen.

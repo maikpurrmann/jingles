@@ -25,9 +25,12 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     }
     var canPause: Bool { state == .playing }
     var canStop: Bool { state != .stopped }
+    var playbackDuration: TimeInterval { audio?.duration ?? 0 }
     var playbackProgress: Double {
         guard let audio, audio.duration.isFinite, audio.duration > 0 else { return 0 }
-        return min(max(0, audio.currentTime / audio.duration), 1)
+        let elapsed = audio.currentTime
+        guard elapsed.isFinite else { return 0 }
+        return min(max(0, elapsed / audio.duration), 1)
     }
 
     private let folderKey = "jingleFolderPath"
@@ -37,6 +40,7 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     private var audio: AVAudioPlayer?
     private var durationTask: Task<Void, Never>?
     private var countdownTimer: Timer?
+    private(set) var playbackRun = UInt64(0)
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -220,6 +224,7 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
             playbackError = "Die Wiedergabe konnte nicht gestartet werden."
             return .unavailable
         }
+        playbackRun &+= 1
         state = .playing
         playbackError = nil
         updateRemainingTime()

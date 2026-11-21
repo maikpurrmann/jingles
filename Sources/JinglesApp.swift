@@ -91,10 +91,18 @@ private struct JinglesView: View {
                 .labelStyle(.iconOnly)
                 .controlSize(.large)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                TimelineView(.animation(paused: !player.canPause)) { _ in
-                    ProgressView(value: player.playbackProgress)
-                        .accessibilityLabel("Wiedergabefortschritt")
-                }
+                PlaybackProgressBar(
+                    progress: player.playbackProgress,
+                    duration: player.playbackDuration,
+                    run: player.canPause ? player.playbackRun : nil
+                )
+                .frame(maxWidth: .infinity)
+                .frame(height: 7)
+                .background(.quaternary, in: Capsule())
+                .clipShape(Capsule())
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Wiedergabefortschritt")
+                .accessibilityValue("\(Int(player.playbackProgress * 100)) Prozent")
             }
             if let message = player.message {
                 Text(message)

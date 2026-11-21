@@ -9,13 +9,21 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
 
     @Published private(set) var folder: URL?
     @Published private(set) var files: [URL] = []
+    @Published private(set) var durations: [URL: Int] = [:]
     @Published private(set) var currentFilename: String?
+    @Published private(set) var remainingSeconds: Int?
+    @Published private(set) var playbackProgress = 0.0
+    @Published private var nextFilename: String?
     @Published private var state: PlaybackState = .stopped
     @Published private(set) var message: String?
     @Published private(set) var playbackError: String?
     @Published private(set) var remoteError: String?
 
-    var canPlay: Bool { state != .playing && (currentFilename != nil || !files.isEmpty) }
+    var selectedFilename: String? { nextFilename ?? currentFilename ?? files.first?.lastPathComponent }
+    var canPlay: Bool {
+        guard let selectedFilename else { return false }
+        return state != .playing || selectedFilename != currentFilename
+    }
     var canPause: Bool { state == .playing }
     var canStop: Bool { state != .stopped }
 
@@ -24,6 +32,8 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     private let defaults: UserDefaults
     private let remote = StreamDeckControl()
     private var audio: AVAudioPlayer?
+    private var durationTask: Task<Void, Never>?
+    private var countdownTimer: Timer?
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -50,6 +60,11 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         })
     }
 
+    deinit {
+        durationTask?.cancel()
+        countdownTimer?.invalidate()
+    }
+
     func chooseFolder() {
         let panel = NSOpenPanel()
         panel.canChooseFiles = false
@@ -63,10 +78,11 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
             if folder?.standardizedFileURL != url.standardizedFileURL {
                 clearPlayback()
                 currentFilename = nil
+                nextFilename = nil
                 defaults.removeObject(forKey: filenameKey)
             }
             folder = url
-            files = contents
+            updateCatalog(contents, reloadDurations: true)
             defaults.set(url.path, forKey: folderKey)
             message = nil
             playbackError = nil
@@ -76,13 +92,17 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     }
 
     func refresh() {
+        refreshCatalog(reloadDurations: true)
+    }
+
+    private func refreshCatalog(reloadDurations: Bool = false) {
         message = nil
         guard let folder else { return }
         do {
-            files = try listAudioFiles(in: folder)
+            updateCatalog(try listAudioFiles(in: folder), reloadDurations: reloadDurations)
             playbackError = nil
         } catch {
-            files = []
+            updateCatalog([])
             playbackError = "Der Ordner „\(folder.lastPathComponent)“ konnte nicht gelesen werden."
         }
     }
@@ -92,11 +112,22 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
             pause()
             return .paused
         }
-        return play()
+        return playCurrent()
+    }
+
+    func select(_ filename: String?) {
+        nextFilename = filename == currentFilename ? nil : filename
     }
 
     @discardableResult
     func play() -> PlaybackResult {
+        if let nextFilename {
+            return play(named: nextFilename)
+        }
+        return playCurrent()
+    }
+
+    private func playCurrent() -> PlaybackResult {
         if canPause { return .playing }
         if let audio {
             return resume(audio)
@@ -104,7 +135,7 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         if let currentFilename {
             return play(named: currentFilename)
         }
-        refresh()
+        refreshCatalog()
         guard let first = files.first else { return .noFile }
         return play(named: first.lastPathComponent)
     }
@@ -112,6 +143,9 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     func pause() {
         guard canPause, let audio else { return }
         audio.pause()
+        countdownTimer?.invalidate()
+        countdownTimer = nil
+        updatePlaybackTime()
         state = .paused
     }
 
@@ -130,7 +164,7 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
 
     @discardableResult
     func play(named name: String) -> PlaybackResult {
-        refresh()
+        refreshCatalog()
         guard folder != nil else { return .noFile }
         if playbackError != nil { return .unavailable }
         guard let file = files.first(where: { $0.lastPathComponent == name }) else {
@@ -143,7 +177,9 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
             next.delegate = self
             clearPlayback()
             currentFilename = file.lastPathComponent
+            if nextFilename == currentFilename { nextFilename = nil }
             defaults.set(currentFilename, forKey: filenameKey)
+            durations[file] = Self.displaySeconds(next.duration)
             audio = next
             return resume(next)
         } catch {
@@ -183,14 +219,63 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         }
         state = .playing
         playbackError = nil
+        updatePlaybackTime()
+        let timer = Timer(timeInterval: 0.1, repeats: true) { [weak self] _ in
+            self?.updatePlaybackTime()
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        countdownTimer = timer
         return .playing
     }
 
     private func clearPlayback() {
+        countdownTimer?.invalidate()
+        countdownTimer = nil
         audio?.delegate = nil
         audio?.stop()
         audio = nil
+        remainingSeconds = nil
+        playbackProgress = 0
         state = .stopped
+    }
+
+    private func updatePlaybackTime() {
+        guard let audio else { return }
+        let duration = audio.duration
+        let elapsed = audio.currentTime
+        let remaining = Self.displaySeconds(max(0, duration - elapsed))
+        if remainingSeconds != remaining {
+            remainingSeconds = remaining
+        }
+        let progress = duration.isFinite && duration > 0 ? min(max(0, elapsed / duration), 1) : 0
+        if playbackProgress != progress {
+            playbackProgress = progress
+        }
+    }
+
+    private func updateCatalog(_ contents: [URL], reloadDurations: Bool = false) {
+        guard reloadDurations || files != contents else { return }
+        files = contents
+        if let nextFilename, !contents.contains(where: { $0.lastPathComponent == nextFilename }) {
+            self.nextFilename = nil
+        }
+        let presentFiles = Set(contents)
+        durations = durations.filter { presentFiles.contains($0.key) }
+        durationTask?.cancel()
+        durationTask = Task { @MainActor [weak self] in
+            for file in contents {
+                guard !Task.isCancelled else { return }
+                let asset = AVURLAsset(url: file)
+                let duration = try? await asset.load(.duration)
+                guard !Task.isCancelled else { return }
+                self?.durations[file] = duration.flatMap { Self.displaySeconds($0.seconds) }
+            }
+        }
+    }
+
+    private static func displaySeconds(_ time: TimeInterval) -> Int? {
+        guard time.isFinite, time >= 0 else { return nil }
+        return Int(exactly: time.rounded(.up))
     }
 
     private func listAudioFiles(in folder: URL) throws -> [URL] {

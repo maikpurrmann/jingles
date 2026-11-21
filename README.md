@@ -4,6 +4,10 @@ Kleiner macOS-Prototyp für Planlosgelöst. In **Jingles** einmal einen Ordner a
 
 In der App hält **Pause** die Wiedergabeposition. **Abspielen** setzt dort fort. **Stopp** setzt die Position zurück, damit das nächste **Abspielen** den Einspieler von Anfang an startet. Die Abspieltaste direkt neben einem Dateinamen startet die jeweilige Datei von Anfang an.
 
+Ein Klick auf eine Zeile markiert den Jingle zur Vorauswahl. Die laufende Wiedergabe bleibt dabei erhalten. Die untere Taste **Abspielen** startet dann den markierten Jingle.
+
+Neben jedem Einspieler steht seine Dauer in Minuten und Sekunden. Beim laufenden Einspieler zählt die Anzeige die Restzeit herunter. Unten stehen die Restzeit und ein Fortschrittsbalken. Bei **Pause** bleiben beide stehen. **Stopp** setzt den Fortschritt zurück und zeigt in der Liste wieder die volle Dauer.
+
 ## App bauen und öffnen
 
 ```sh
@@ -16,7 +20,7 @@ Der Build verwendet die macOS-Command-Line-Tools von Apple. Die lokal signierte 
 ## Stream Deck
 
 1. Einer freien Taste **System → Webseite** zuweisen.
-2. In Jingles neben dem gewünschten Einspieler **Link kopieren** wählen und den Link als URL einfügen.
+2. In Jingles auf das **Link-Symbol** neben dem gewünschten Einspieler klicken und den kopierten Link als URL einfügen.
 3. **GET-Anfrage im Hintergrund** auswählen. Ein Druck startet den Einspieler. Ein weiterer Druck auf dieselbe Taste stoppt den laufenden Einspieler. Beim nächsten Druck beginnt er wieder von Anfang an. Die Taste eines anderen Einspielers wechselt direkt zu dieser Datei. Das funktioniert auch, wenn Jingles minimiert ist.
 
 Der Link verweist auf den Dateinamen im ausgewählten Ordner. Weitere Dateien und eine geänderte Sortierung beeinflussen ihn nicht. Bei einer gleichnamigen Ersatzdatei liest die App beim Neustart des Einspielers die neue Fassung. Nach einem Umbenennen, Löschen oder Ändern der Endung meldet die App die fehlende Datei. Nach einem Umbenennen den neuen Link kopieren.

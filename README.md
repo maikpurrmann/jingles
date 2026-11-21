@@ -35,7 +35,7 @@ curl -fsS http://127.0.0.1:17639/toggle
 
 Der Prozentknopf unten rechts wechselt zwischen **100 %** und dem eingestellten leisen Pegel. Die **Fade-Einstellungen** daneben merken sich Zielpegel sowie getrennte Zeiten fürs Absenken und Anheben. Die Startwerte sind **10 %**, **0,3 s** abwärts und **3,0 s** aufwärts. Bei jedem App-Start liegt der Pegel wieder bei 100 %.
 
-Der Fade liegt auf der gesamten Jingles-Ausgabe. Beim Wechsel des Einspielers gilt der aktuelle Pegel weiter. Audient, OBS-Spur und VDO.Ninja bekommen den schon geregelten App-Ton. Der Mikrofonpegel bleibt separat.
+Der Fade liegt auf der gesamten Jingles-Ausgabe. Beim Wechsel des Einspielers gilt der aktuelle Pegel weiter. Der geregelte App-Ton geht direkt ans Audient. OBS erfasst denselben Ton für die Aufnahme und für den Sendemix über BlackHole zu VDO.Ninja. Der Mikrofonpegel bleibt separat.
 
 In den **Fade-Einstellungen** auf **Stream-Deck-Link kopieren** klicken und den Link `http://127.0.0.1:17639/fade` wie bei den Einspielern mit **System → Webseite → GET-Anfrage im Hintergrund** belegen. Ein Druck senkt ab, der nächste hebt an. App und Stream Deck schalten denselben Pegel um.
 
@@ -55,5 +55,5 @@ Für den Kopfhörer am Audient iD14 das Audient als macOS-Tonausgabe verwenden. 
 - OBS hat die App nach einem Jingles-Neustart wiedererkannt. Maiks MKV-Probe bestätigt **Spur 1 Abhörmix**, **Spur 2 Mikrofon** und **Spur 3 Jingles**.
 - Mit der Ordnerliste wurden `01_PLG_Intro.wav` und `02_PLG_Outro.mp3` über ihre Einzel-Links gestartet. Beide Einspieler sind in der OBS-Probe auf **Spur 3** nachweisbar. Maik bestätigte das Kopieren und Belegen der Links am Stream Deck. Die aktualisierte Start-/Stopp-Logik verwendet dieselben Links.
 - In **0.2.4** animiert die App den Fortschrittsbalken durchgehend. Der Countdown aktualisiert sich separat. Linearer Fortschritt, Pause, Fortsetzen und Rücksetzen wurden geprüft. Maik bestätigte, dass die Anzeige deutlich flüssiger läuft.
-- In **0.3.0** bestätigte eine OBS-Probe auf Spur 3 das Absenken auf etwa **10 % des Normalpegels**, den leisen Start des nächsten Einspielers und das Anheben über etwa **3 s**. Die Befehle liefen über den kopierten Fade-Link. Die physische Fade-Taste und der Pegelverlauf bei Christian stehen zur Probe an.
+- In **0.3.0** bestätigte die OBS-Aufnahme `2026-11-21 22-16-43.mkv` auf Spur 3 das Absenken auf etwa **10 % des Normalpegels**, den leisen Start des nächsten Einspielers und das Anheben über etwa **3 s**. Die Befehle liefen über den kopierten Fade-Link. Maik bestätigte anschließend auch den Test am physischen Stream Deck. Der Hörvergleich bei Christian steht aus.
 - Maik hat die WAV über VDO.Ninja auf seinem MacBook als Gegenstelle gehört. Der gemeinsame Hörtest mit Christian ist offen.

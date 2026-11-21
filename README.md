@@ -13,7 +13,7 @@ Der Build verwendet die macOS-Command-Line-Tools von Apple. Die lokal signierte 
 
 ## Stream Deck
 
-1. Einer freien Taste **System → Website** zuweisen.
+1. Einer freien Taste **System → Webseite** zuweisen.
 2. Als URL `http://127.0.0.1:17639/toggle` eintragen und **GET-Anfrage im Hintergrund** auswählen.
 3. Jingles öffnen, eine WAV auswählen und das Fenster minimieren. Die Taste abwechselnd für Wiedergabe und Pause drücken.
 

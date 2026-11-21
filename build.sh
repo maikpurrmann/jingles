@@ -18,13 +18,18 @@ cp Info.plist "$app/Contents/Info.plist"
     Sources/JinglesApp.swift Sources/StreamDeckControl.swift -o "$app/Contents/MacOS/Jingles"
 /usr/bin/codesign --force --sign - "$app"
 /usr/bin/codesign --verify --strict "$app"
-rm -rf -- build/Jingles.app
-mv "$app" build/Jingles.app
 if (( $# )); then
     mkdir -p "$HOME/Applications"
-    /usr/bin/ditto build/Jingles.app "$HOME/Applications/Jingles.app"
+    /usr/bin/ditto "$app" "$HOME/Applications/Jingles.app"
     /usr/bin/codesign --verify --strict "$HOME/Applications/Jingles.app"
+    if [[ -d build/Jingles.app ]]; then
+        mv build/Jingles.app "$staging/previous-build"
+    fi
     print -r -- "$HOME/Applications/Jingles.app"
 else
+    if [[ -d build/Jingles.app ]]; then
+        mv build/Jingles.app "$staging/previous-build"
+    fi
+    mv "$app" build/Jingles.app
     print -r -- "$PWD/build/Jingles.app"
 fi

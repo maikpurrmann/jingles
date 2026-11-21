@@ -16,6 +16,7 @@ struct JinglesApp: App {
 
 private struct JinglesView: View {
     @ObservedObject var player: JinglePlayer
+    @StateObject private var fadeSettingsPresentation = FadeSettingsPresentation()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -35,7 +36,11 @@ private struct JinglesView: View {
                 .labelStyle(.iconOnly)
                 .help("Ordner aktualisieren")
                 .disabled(player.folder == nil)
-                Button("Ordner auswählen …", action: player.chooseFolder)
+                Button(action: player.chooseFolder) {
+                    Label("Ordner auswählen", systemImage: "folder")
+                }
+                .labelStyle(.iconOnly)
+                .help("Ordner auswählen")
             }
             if player.files.isEmpty {
                 Spacer(minLength: 40)
@@ -81,12 +86,13 @@ private struct JinglesView: View {
                             .lineLimit(1)
                             .truncationMode(.middle)
                     }
+                    Spacer(minLength: 0)
                     if let remaining = player.remainingSeconds {
-                        Spacer(minLength: 0)
                         Text("Noch \(timeLabel(remaining))")
                             .monospacedDigit()
                             .fixedSize()
                     }
+                    fadeControls
                 }
                 .labelStyle(.iconOnly)
                 .controlSize(.large)
@@ -122,6 +128,68 @@ private struct JinglesView: View {
         }
         .padding(22)
         .frame(minWidth: 500, minHeight: 330)
+    }
+
+    private var fadeControls: some View {
+        let level = player.isLowered ? player.loweredPercent : 100
+        let action = player.isLowered ? "Auf 100 % anheben" : "Auf \(player.loweredPercent) % absenken"
+        return HStack(spacing: 6) {
+            Button {
+                player.toggleFade()
+            } label: {
+                Label {
+                    Text("\(level) %").monospacedDigit()
+                } icon: {
+                    Image(systemName: player.isLowered ? "speaker.wave.1" : "speaker.wave.2")
+                }
+                .labelStyle(.titleAndIcon)
+                .fixedSize()
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(player.isLowered ? Color.orange : Color.accentColor)
+            .help(action)
+            .accessibilityLabel(action)
+            .accessibilityValue("\(level) Prozent")
+
+            Button {
+                fadeSettingsPresentation.isOpen.toggle()
+            } label: {
+                Label("Fade-Einstellungen", systemImage: "slider.horizontal.3")
+            }
+            .help("Fade-Einstellungen")
+            .popover(isPresented: $fadeSettingsPresentation.isOpen, arrowEdge: .top) {
+                fadeSettings
+            }
+        }
+    }
+
+    private var fadeSettings: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Jingle-Fade").font(.headline)
+            Stepper(value: $player.loweredPercent, in: 0...100) {
+                LabeledContent("Absenken auf", value: "\(player.loweredPercent) %")
+            }
+            Stepper(value: $player.fadeDownSeconds, in: 0...30, step: 0.1) {
+                LabeledContent("Zeit zum Absenken", value: fadeTimeLabel(player.fadeDownSeconds))
+            }
+            Stepper(value: $player.fadeUpSeconds, in: 0...30, step: 0.1) {
+                LabeledContent("Zeit zum Anheben", value: fadeTimeLabel(player.fadeUpSeconds))
+            }
+            Button {
+                player.copyFadeLink()
+                fadeSettingsPresentation.isOpen = false
+            } label: {
+                Label("Stream-Deck-Link kopieren", systemImage: "link")
+                    .labelStyle(.titleAndIcon)
+            }
+        }
+        .controlSize(.regular)
+        .padding(16)
+        .frame(width: 320)
+    }
+
+    private func fadeTimeLabel(_ seconds: Double) -> String {
+        seconds.formatted(.number.precision(.fractionLength(1))) + " s"
     }
 
     private func jingleRow(_ file: URL) -> some View {
@@ -172,4 +240,8 @@ private struct JinglesView: View {
         guard let seconds else { return "–:––" }
         return "\(seconds / 60):\(String(format: "%02d", seconds % 60))"
     }
+}
+
+private final class FadeSettingsPresentation: ObservableObject {
+    @Published var isOpen = false
 }

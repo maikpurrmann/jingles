@@ -1,6 +1,6 @@
 # Jingles
 
-Kleiner macOS-Prototyp für Planlosgelöst. In **Jingles** einmal einen Ordner auswählen. Die App zeigt dessen WAV- und MP3-Dateien an und spielt immer eine Datei über die aktuelle macOS-Tonausgabe ab. Über **Aktualisieren** liest sie den Ordner erneut ein. Unterordner bleiben außen vor.
+Kleiner macOS-Prototyp für Planlosgelöst. In **Jingles** über das Ordnersymbol oben rechts einmal einen Ordner auswählen. Die App zeigt dessen WAV- und MP3-Dateien an und spielt immer eine Datei über die aktuelle macOS-Tonausgabe ab. Über **Aktualisieren** liest sie den Ordner erneut ein. Unterordner bleiben außen vor.
 
 In der App hält **Pause** die Wiedergabeposition. **Abspielen** setzt dort fort. **Stopp** setzt die Position zurück, damit das nächste **Abspielen** den Einspieler von Anfang an startet. Die Abspieltaste direkt neben einem Dateinamen startet die jeweilige Datei von Anfang an.
 
@@ -31,6 +31,14 @@ Die App muss dabei laufen. Maiks vorhandene Taste **Jingles** auf **Seite 4, zwe
 curl -fsS http://127.0.0.1:17639/toggle
 ```
 
+## Gemeinsamer Jingle-Fade
+
+Der Prozentknopf unten rechts wechselt zwischen **100 %** und dem eingestellten leisen Pegel. Die **Fade-Einstellungen** daneben merken sich Zielpegel sowie getrennte Zeiten fürs Absenken und Anheben. Die Startwerte sind **10 %**, **0,3 s** abwärts und **3,0 s** aufwärts. Bei jedem App-Start liegt der Pegel wieder bei 100 %.
+
+Der Fade liegt auf der gesamten Jingles-Ausgabe. Beim Wechsel des Einspielers gilt der aktuelle Pegel weiter. Audient, OBS-Spur und VDO.Ninja bekommen den schon geregelten App-Ton. Der Mikrofonpegel bleibt separat.
+
+In den **Fade-Einstellungen** auf **Stream-Deck-Link kopieren** klicken und den Link `http://127.0.0.1:17639/fade` wie bei den Einspielern mit **System → Webseite → GET-Anfrage im Hintergrund** belegen. Ein Druck senkt ab, der nächste hebt an. App und Stream Deck schalten denselben Pegel um.
+
 ## OBS
 
 1. Jingles öffnen und einen Einspieler kurz abspielen.
@@ -47,5 +55,5 @@ Für den Kopfhörer am Audient iD14 das Audient als macOS-Tonausgabe verwenden. 
 - OBS hat die App nach einem Jingles-Neustart wiedererkannt. Maiks MKV-Probe bestätigt **Spur 1 Abhörmix**, **Spur 2 Mikrofon** und **Spur 3 Jingles**.
 - Mit der Ordnerliste wurden `01_PLG_Intro.wav` und `02_PLG_Outro.mp3` über ihre Einzel-Links gestartet. Beide Einspieler sind in der OBS-Probe auf **Spur 3** nachweisbar. Maik bestätigte das Kopieren und Belegen der Links am Stream Deck. Die aktualisierte Start-/Stopp-Logik verwendet dieselben Links.
 - In **0.2.4** animiert die App den Fortschrittsbalken durchgehend. Der Countdown aktualisiert sich separat. Linearer Fortschritt, Pause, Fortsetzen und Rücksetzen wurden geprüft. Maik bestätigte, dass die Anzeige deutlich flüssiger läuft.
+- In **0.3.0** bestätigte eine OBS-Probe auf Spur 3 das Absenken auf etwa **10 % des Normalpegels**, den leisen Start des nächsten Einspielers und das Anheben über etwa **3 s**. Die Befehle liefen über den kopierten Fade-Link. Die physische Fade-Taste und der Pegelverlauf bei Christian stehen zur Probe an.
 - Maik hat die WAV über VDO.Ninja auf seinem MacBook als Gegenstelle gehört. Der gemeinsame Hörtest mit Christian ist offen.
-- Das Absenken auf **10 %** und der langsame Fade zurück auf **100 %** sind noch offen.

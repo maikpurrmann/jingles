@@ -17,6 +17,21 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     @Published private(set) var message: String?
     @Published private(set) var playbackError: String?
     @Published private(set) var remoteError: String?
+    @Published private(set) var isLowered = false
+    @Published var loweredPercent = 10 {
+        didSet {
+            defaults.set(loweredPercent, forKey: "loweredPercent")
+            if isLowered {
+                setMasterLevel(Float(loweredPercent) / 100, duration: fadeDownSeconds)
+            }
+        }
+    }
+    @Published var fadeDownSeconds = 0.3 {
+        didSet { defaults.set(fadeDownSeconds, forKey: "fadeDownSeconds") }
+    }
+    @Published var fadeUpSeconds = 3.0 {
+        didSet { defaults.set(fadeUpSeconds, forKey: "fadeUpSeconds") }
+    }
 
     var selectedFilename: String? { nextFilename ?? currentFilename ?? files.first?.lastPathComponent }
     var canPlay: Bool {
@@ -41,10 +56,15 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     private var durationTask: Task<Void, Never>?
     private var countdownTimer: Timer?
     private(set) var playbackRun = UInt64(0)
+    private var masterRamp = MasterGainRamp(start: 1, target: 1, beginsAt: 0, duration: 0)
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         super.init()
+        defaults.register(defaults: ["loweredPercent": 10, "fadeDownSeconds": 0.3, "fadeUpSeconds": 3.0])
+        loweredPercent = min(max(defaults.integer(forKey: "loweredPercent"), 0), 100)
+        fadeDownSeconds = Self.checkedDuration(defaults.double(forKey: "fadeDownSeconds"), fallback: 0.3)
+        fadeUpSeconds = Self.checkedDuration(defaults.double(forKey: "fadeUpSeconds"), fallback: 3.0)
         if let path = defaults.string(forKey: folderKey) {
             folder = URL(fileURLWithPath: path, isDirectory: true)
             currentFilename = defaults.string(forKey: filenameKey)
@@ -61,6 +81,7 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
             switch command {
             case .toggle: return self.toggle()
             case .play(let name): return self.toggle(named: name)
+            case .fade: return self.toggleFade()
             }
         }, failed: { [weak self] message in
             self?.remoteError = message
@@ -161,6 +182,14 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         playbackError = nil
     }
 
+    @discardableResult
+    func toggleFade() -> PlaybackResult {
+        isLowered.toggle()
+        let target: Float = isLowered ? Float(loweredPercent) / 100 : 1
+        setMasterLevel(target, duration: isLowered ? fadeDownSeconds : fadeUpSeconds)
+        return isLowered ? .lowered : .normal
+    }
+
     private func toggle(named name: String) -> PlaybackResult {
         if canPause, currentFilename == name {
             stop()
@@ -196,11 +225,19 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     }
 
     func copyStreamDeckLink(for name: String) {
-        guard let link = StreamDeckCommand.play(name).link else { return }
+        copyLink(.play(name), message: "Stream-Deck-Link für „\(name)“ kopiert.")
+    }
+
+    func copyFadeLink() {
+        copyLink(.fade, message: "Stream-Deck-Link für den Fade kopiert.")
+    }
+
+    private func copyLink(_ command: StreamDeckCommand, message: String) {
+        guard let link = command.link else { return }
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         if pasteboard.setString(link, forType: .string) {
-            message = "Stream-Deck-Link für „\(name)“ kopiert."
+            self.message = message
         }
     }
 
@@ -219,11 +256,14 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
     }
 
     private func resume(_ player: AVAudioPlayer) -> PlaybackResult {
+        let now = ProcessInfo.processInfo.systemUptime
+        player.setVolume(masterRamp.level(at: now), fadeDuration: 0)
         guard player.play() else {
             clearPlayback()
             playbackError = "Die Wiedergabe konnte nicht gestartet werden."
             return .unavailable
         }
+        continueMasterRamp(on: player, at: now)
         playbackRun &+= 1
         state = .playing
         playbackError = nil
@@ -244,6 +284,26 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         audio = nil
         remainingSeconds = nil
         state = .stopped
+    }
+
+    private func setMasterLevel(_ target: Float, duration: TimeInterval) {
+        let now = ProcessInfo.processInfo.systemUptime
+        masterRamp = MasterGainRamp(start: masterRamp.level(at: now), target: target,
+                                    beginsAt: now, duration: duration)
+        guard let audio, canPause else { return }
+        audio.setVolume(masterRamp.level(at: now), fadeDuration: 0)
+        continueMasterRamp(on: audio, at: now)
+    }
+
+    private func continueMasterRamp(on audio: AVAudioPlayer, at time: TimeInterval) {
+        let remaining = masterRamp.remaining(at: time)
+        if remaining > 0 {
+            audio.setVolume(masterRamp.target, fadeDuration: remaining)
+        }
+    }
+
+    private static func checkedDuration(_ seconds: Double, fallback: Double) -> Double {
+        seconds.isFinite ? min(max(seconds, 0), 30) : fallback
     }
 
     private func updateRemainingTime() {
@@ -290,5 +350,22 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         }.sorted { a, b in
             a.lastPathComponent.localizedStandardCompare(b.lastPathComponent) == .orderedAscending
         }
+    }
+}
+
+private struct MasterGainRamp {
+    let start: Float
+    let target: Float
+    let beginsAt: TimeInterval
+    let duration: TimeInterval
+
+    func level(at time: TimeInterval) -> Float {
+        guard duration > 0 else { return target }
+        let position = Float(1 - remaining(at: time) / duration)
+        return start + (target - start) * position
+    }
+
+    func remaining(at time: TimeInterval) -> TimeInterval {
+        max(0, duration - max(0, time - beginsAt))
     }
 }

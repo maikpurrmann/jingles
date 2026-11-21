@@ -2,13 +2,15 @@ import Foundation
 import Network
 
 enum PlaybackResult {
-    case playing, paused, stopped, noFile, missingFile, unavailable
+    case playing, paused, stopped, lowered, normal, noFile, missingFile, unavailable
 
     var response: (status: String, body: String) {
         switch self {
         case .playing: ("200 OK", "playing")
         case .paused: ("200 OK", "paused")
         case .stopped: ("200 OK", "stopped")
+        case .lowered: ("200 OK", "lowered")
+        case .normal: ("200 OK", "normal")
         case .noFile: ("409 Conflict", "no jingle selected")
         case .missingFile: ("404 Not Found", "jingle not found")
         case .unavailable: ("503 Service Unavailable", "playback unavailable")
@@ -19,6 +21,7 @@ enum PlaybackResult {
 enum StreamDeckCommand {
     case toggle
     case play(String)
+    case fade
 
     static let host = "127.0.0.1"
     static let port: NWEndpoint.Port = 17639
@@ -30,6 +33,10 @@ enum StreamDeckCommand {
     init?(target: String) {
         if target == "/toggle" {
             self = .toggle
+            return
+        }
+        if target == "/fade" {
+            self = .fade
             return
         }
         guard target.hasPrefix(Self.playPrefix),
@@ -45,6 +52,8 @@ enum StreamDeckCommand {
         switch self {
         case .toggle:
             return root + "/toggle"
+        case .fade:
+            return root + "/fade"
         case .play(let name):
             guard let encoded = name.addingPercentEncoding(withAllowedCharacters: Self.filenameCharacters) else {
                 return nil

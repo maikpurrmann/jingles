@@ -46,5 +46,6 @@ Für den Kopfhörer am Audient iD14 das Audient als macOS-Tonausgabe verwenden. 
 
 - OBS hat die App nach einem Jingles-Neustart wiedererkannt. Maiks MKV-Probe bestätigt **Spur 1 Abhörmix**, **Spur 2 Mikrofon** und **Spur 3 Jingles**.
 - Mit der Ordnerliste wurden `01_PLG_Intro.wav` und `02_PLG_Outro.mp3` über ihre Einzel-Links gestartet. Beide Einspieler sind in der OBS-Probe auf **Spur 3** nachweisbar. Maik bestätigte das Kopieren und Belegen der Links am Stream Deck. Die aktualisierte Start-/Stopp-Logik verwendet dieselben Links.
+- In **0.2.4** animiert die App den Fortschrittsbalken durchgehend. Der Countdown aktualisiert sich separat. Linearer Fortschritt, Pause, Fortsetzen und Rücksetzen wurden geprüft. Maik bestätigte, dass die Anzeige deutlich flüssiger läuft.
 - Maik hat die WAV über VDO.Ninja auf seinem MacBook als Gegenstelle gehört. Der gemeinsame Hörtest mit Christian ist offen.
 - Das Absenken auf **10 %** und der langsame Fade zurück auf **100 %** sind noch offen.

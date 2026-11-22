@@ -6,6 +6,8 @@ Jingles ist ein macOS-Soundboard für Podcasts und Live-Aufnahmen. Spiele WAV- u
 
 **[Jingles 0.4.0 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.4.0/Jingles-0.4.0-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.4.0)
 
+<img src="docs/jingles-wiedergabe.png" alt="Jingles während der Wiedergabe: Das laufende Outro ist mit einer türkisen Wellenform markiert. Restzeit, Wiedergabetasten und Fade stehen unten." width="500">
+
 Voraussetzung für den fertigen Download ist ein Mac mit Apple-Chip und macOS 13 Ventura oder neuer.
 
 1. Die ZIP-Datei entpacken, `Jingles.app` in den gewünschten Programme-Ordner ziehen und öffnen. Bei einem Update zuerst Jingles beenden und die vorhandene App am bisherigen Ort ersetzen.

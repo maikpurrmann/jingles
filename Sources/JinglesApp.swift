@@ -26,16 +26,22 @@ private final class JinglesApplicationDelegate: NSObject, NSApplicationDelegate 
 
 private struct JinglesView: View {
     @ObservedObject var player: JinglePlayer
-    @StateObject private var fadeSettingsPresentation = FadeSettingsPresentation()
+    @StateObject private var popovers = PopoverPresentation()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 8) {
-                Text(player.folder?.lastPathComponent ?? "Kein Ordner ausgewählt")
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                    .help(player.folder?.path ?? "")
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Jingles")
+                        .font(.system(size: 30, weight: .semibold))
+                        .accessibilityAddTraits(.isHeader)
+                    Text(player.folder?.lastPathComponent ?? "Kein Ordner ausgewählt")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .help(player.folder?.path ?? "")
+                }
                 Spacer()
                 Button(action: player.refresh) {
                     Label("Aktualisieren", systemImage: "arrow.clockwise")
@@ -46,6 +52,15 @@ private struct JinglesView: View {
                     Label("Ordner auswählen", systemImage: "folder")
                 }
                 .help("Ordner auswählen")
+                Button {
+                    popovers.showsInfo.toggle()
+                } label: {
+                    Label("Info und Bedienhilfe", systemImage: "info.circle")
+                }
+                .help("Info und Bedienhilfe")
+                .popover(isPresented: $popovers.showsInfo, arrowEdge: .bottom) {
+                    JinglesInfoView()
+                }
             }
             .labelStyle(.iconOnly)
             if player.files.isEmpty {
@@ -175,12 +190,12 @@ private struct JinglesView: View {
             .accessibilityValue("\(state), \(level) Prozent")
 
             Button {
-                fadeSettingsPresentation.isOpen.toggle()
+                popovers.showsFadeSettings.toggle()
             } label: {
                 Label("Fade-Einstellungen", systemImage: "slider.horizontal.3")
             }
             .help("Fade-Einstellungen")
-            .popover(isPresented: $fadeSettingsPresentation.isOpen, arrowEdge: .top) {
+            .popover(isPresented: $popovers.showsFadeSettings, arrowEdge: .top) {
                 fadeSettings
             }
         }
@@ -201,7 +216,7 @@ private struct JinglesView: View {
             }
             Button {
                 player.copyFadeLink()
-                fadeSettingsPresentation.isOpen = false
+                popovers.showsFadeSettings = false
             } label: {
                 Label("Stream-Deck-Link kopieren", systemImage: "link")
                     .labelStyle(.titleAndIcon)
@@ -275,6 +290,54 @@ private struct JinglesView: View {
     }
 }
 
+private struct JinglesInfoView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Über \(appName)")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.primary)
+                Text("Version \(version) · Build \(build)")
+                if let date = Bundle.main.object(forInfoDictionaryKey: "JinglesBuildDate") as? String {
+                    Text("Gebaut am \(date)")
+                }
+                Text("Für Planlosgelöst entwickelt, seit November 2026.")
+            }
+            .foregroundStyle(.secondary)
+            .font(.callout)
+            Divider()
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Einspieler").font(.headline)
+                Text("Wähle einen Ordner mit WAV- oder MP3-Dateien. Ein Klick auf die Zeile wählt den Jingle vor. Das Play-Symbol in der Zeile startet ihn von vorn.")
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Wiedergabe und Fade").font(.headline)
+                Text("Pause hält die Position, Stopp setzt sie zurück. Der Prozentknopf senkt alle Jingles gemeinsam ab und hebt sie beim nächsten Klick wieder an. Zielpegel und Zeiten stehen in den Fade-Einstellungen.")
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Stream Deck").font(.headline)
+                Text("Kopiere den Link neben dem Jingle oder in den Fade-Einstellungen. Hinterlege ihn als Webseite mit GET-Anfrage im Hintergrund. Jingles muss dafür geöffnet sein.")
+            }
+        }
+        .font(.callout)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(18)
+        .frame(width: 350)
+    }
+
+    private var appName: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "Jingles"
+    }
+
+    private var version: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+    }
+
+    private var build: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "?"
+    }
+}
+
 private struct TransportButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
     var prominent = false
@@ -294,6 +357,7 @@ private struct TransportButtonStyle: ButtonStyle {
     }
 }
 
-private final class FadeSettingsPresentation: ObservableObject {
-    @Published var isOpen = false
+private final class PopoverPresentation: ObservableObject {
+    @Published var showsInfo = false
+    @Published var showsFadeSettings = false
 }

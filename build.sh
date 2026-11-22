@@ -11,8 +11,17 @@ mkdir -p build
 staging=$(mktemp -d "${PWD}/build/staging.XXXXXX")
 trap 'rm -rf -- "$staging"' EXIT
 app="$staging/Jingles.app"
-mkdir -p "$app/Contents/MacOS"
+iconset="$staging/AppIcon.iconset"
+mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$iconset"
 cp Info.plist "$app/Contents/Info.plist"
+for size in 16 32 128 256 512; do
+    /usr/bin/sips -z "$size" "$size" Resources/AppIcon.png \
+        --out "$iconset/icon_${size}x${size}.png" >/dev/null
+    double=$((size * 2))
+    /usr/bin/sips -z "$double" "$double" Resources/AppIcon.png \
+        --out "$iconset/icon_${size}x${size}@2x.png" >/dev/null
+done
+/usr/bin/iconutil -c icns "$iconset" -o "$app/Contents/Resources/AppIcon.icns"
 /usr/bin/swiftc -O -swift-version 5 -parse-as-library \
     -target "$(uname -m)-apple-macosx13.0" \
     Sources/*.swift -o "$app/Contents/MacOS/Jingles"

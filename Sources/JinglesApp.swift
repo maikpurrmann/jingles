@@ -30,27 +30,24 @@ private struct JinglesView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .center) {
-                playbackClock
+            HStack(spacing: 8) {
+                Text(player.folder?.lastPathComponent ?? "Kein Ordner ausgewählt")
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .help(player.folder?.path ?? "")
                 Spacer()
-                HStack(spacing: 8) {
-                    Text(player.folder?.lastPathComponent ?? "Kein Ordner ausgewählt")
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                        .help(player.folder?.path ?? "")
-                    Button(action: player.refresh) {
-                        Label("Aktualisieren", systemImage: "arrow.clockwise")
-                    }
-                    .help("Ordner aktualisieren")
-                    .disabled(player.folder == nil)
-                    Button(action: player.chooseFolder) {
-                        Label("Ordner auswählen", systemImage: "folder")
-                    }
-                    .help("Ordner auswählen")
+                Button(action: player.refresh) {
+                    Label("Aktualisieren", systemImage: "arrow.clockwise")
                 }
-                .labelStyle(.iconOnly)
+                .help("Ordner aktualisieren")
+                .disabled(player.folder == nil)
+                Button(action: player.chooseFolder) {
+                    Label("Ordner auswählen", systemImage: "folder")
+                }
+                .help("Ordner auswählen")
             }
+            .labelStyle(.iconOnly)
             if player.files.isEmpty {
                 Spacer(minLength: 40)
                 Text(player.folder == nil
@@ -71,24 +68,9 @@ private struct JinglesView: View {
             }
             VStack(spacing: 8) {
                 HStack(spacing: 8) {
-                    Button {
-                        player.play()
-                    } label: {
-                        Label("Abspielen", systemImage: "play.fill")
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .help("Abspielen")
-                    .disabled(!player.canPlay)
-                    Button(action: player.pause) {
-                        Label("Pause", systemImage: "pause.fill")
-                    }
-                    .help("Pause")
-                    .disabled(!player.canPause)
-                    Button(action: player.stop) {
-                        Label("Stopp", systemImage: "stop.fill")
-                    }
-                    .help("Stopp")
-                    .disabled(!player.canStop)
+                    transportControls
+                    Spacer(minLength: 0)
+                    playbackClock
                     Spacer(minLength: 0)
                     fadeControls
                 }
@@ -130,16 +112,44 @@ private struct JinglesView: View {
 
     private var playbackClock: some View {
         let paused = player.canStop && !player.canPause
-        return VStack(alignment: .leading, spacing: 2) {
+        return VStack(spacing: 0) {
             Text(paused ? "Restzeit · Pausiert" : "Restzeit")
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(.secondary)
-            Text(timeLabel(player.remainingSeconds))
-                .font(.system(size: 38, weight: .semibold, design: .monospaced))
+            Text(timeLabel(player.remainingSeconds ?? 0))
+                .font(.system(size: 36, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
                 .foregroundStyle(player.remainingSeconds == nil ? .secondary : .primary)
         }
-        .fixedSize()
+        .frame(minWidth: 108)
         .accessibilityElement(children: .combine)
+    }
+
+    private var transportControls: some View {
+        HStack(spacing: 8) {
+            Button {
+                player.play()
+            } label: {
+                Label("Abspielen", systemImage: "play.fill")
+            }
+            .buttonStyle(TransportButtonStyle(prominent: true))
+            .help("Abspielen")
+            .disabled(!player.canPlay)
+            Button(action: player.pause) {
+                Label("Pause", systemImage: "pause.fill")
+            }
+            .buttonStyle(TransportButtonStyle())
+            .help("Pause")
+            .disabled(!player.canPause)
+            Button(action: player.stop) {
+                Label("Stopp", systemImage: "stop.fill")
+            }
+            .buttonStyle(TransportButtonStyle())
+            .help("Stopp")
+            .disabled(!player.canStop)
+        }
     }
 
     private var fadeControls: some View {
@@ -174,6 +184,7 @@ private struct JinglesView: View {
                 fadeSettings
             }
         }
+        .controlSize(.regular)
     }
 
     private var fadeSettings: some View {
@@ -223,6 +234,9 @@ private struct JinglesView: View {
             } label: {
                 Image(systemName: "play.fill")
                     .foregroundStyle(isPlaying ? Color.mint : Color.secondary)
+                    .frame(width: 24, height: 24)
+                    .background(Color.mint.opacity(isPlaying ? 0.16 : 0), in: Circle())
+                    .contentShape(Rectangle())
             }
             .help("„\(name)“ von Anfang an abspielen")
             .accessibilityLabel("„\(name)“ abspielen")
@@ -258,6 +272,25 @@ private struct JinglesView: View {
     private func timeLabel(_ seconds: Int?) -> String {
         guard let seconds else { return "–:––" }
         return "\(seconds / 60):\(String(format: "%02d", seconds % 60))"
+    }
+}
+
+private struct TransportButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+    var prominent = false
+
+    func makeBody(configuration: Configuration) -> some View {
+        let color = prominent && isEnabled ? Color.accentColor : Color.primary
+        return configuration.label
+            .font(.system(size: 16, weight: .semibold))
+            .foregroundStyle(color.opacity(isEnabled ? 1 : 0.35))
+            .frame(width: 44, height: 44)
+            .background(color.opacity(isEnabled ? 0.14 : 0.06), in: Circle())
+            .overlay {
+                Circle().strokeBorder(color.opacity(isEnabled ? 0.30 : 0.10), lineWidth: 1)
+            }
+            .contentShape(Circle())
+            .opacity(configuration.isPressed ? 0.7 : 1)
     }
 }
 

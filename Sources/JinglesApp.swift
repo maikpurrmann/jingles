@@ -31,26 +31,25 @@ private struct JinglesView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("Jingles")
-                        .font(.system(size: 32, weight: .semibold))
+                playbackClock
+                Spacer()
+                HStack(spacing: 8) {
                     Text(player.folder?.lastPathComponent ?? "Kein Ordner ausgewählt")
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
+                        .truncationMode(.middle)
                         .help(player.folder?.path ?? "")
-                }
-                Spacer()
-                Button(action: player.refresh) {
-                    Label("Aktualisieren", systemImage: "arrow.clockwise")
+                    Button(action: player.refresh) {
+                        Label("Aktualisieren", systemImage: "arrow.clockwise")
+                    }
+                    .help("Ordner aktualisieren")
+                    .disabled(player.folder == nil)
+                    Button(action: player.chooseFolder) {
+                        Label("Ordner auswählen", systemImage: "folder")
+                    }
+                    .help("Ordner auswählen")
                 }
                 .labelStyle(.iconOnly)
-                .help("Ordner aktualisieren")
-                .disabled(player.folder == nil)
-                Button(action: player.chooseFolder) {
-                    Label("Ordner auswählen", systemImage: "folder")
-                }
-                .labelStyle(.iconOnly)
-                .help("Ordner auswählen")
             }
             if player.files.isEmpty {
                 Spacer(minLength: 40)
@@ -90,18 +89,7 @@ private struct JinglesView: View {
                     }
                     .help("Stopp")
                     .disabled(!player.canStop)
-                    if let name = player.canStop ? player.currentFilename : player.selectedFilename {
-                        Text(name)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                            .truncationMode(.middle)
-                    }
                     Spacer(minLength: 0)
-                    if let remaining = player.remainingSeconds {
-                        Text("Noch \(timeLabel(remaining))")
-                            .monospacedDigit()
-                            .fixedSize()
-                    }
                     fadeControls
                 }
                 .labelStyle(.iconOnly)
@@ -140,26 +128,41 @@ private struct JinglesView: View {
         .frame(minWidth: 500, minHeight: 330)
     }
 
+    private var playbackClock: some View {
+        let paused = player.canStop && !player.canPause
+        return VStack(alignment: .leading, spacing: 2) {
+            Text(paused ? "Restzeit · Pausiert" : "Restzeit")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.secondary)
+            Text(timeLabel(player.remainingSeconds))
+                .font(.system(size: 38, weight: .semibold, design: .monospaced))
+                .foregroundStyle(player.remainingSeconds == nil ? .secondary : .primary)
+        }
+        .fixedSize()
+        .accessibilityElement(children: .combine)
+    }
+
     private var fadeControls: some View {
         let level = player.isLowered ? player.loweredPercent : 100
+        let state = player.isLowered ? "Abgesenkt" : "Normal"
         let action = player.isLowered ? "Auf 100 % anheben" : "Auf \(player.loweredPercent) % absenken"
         return HStack(spacing: 6) {
             Button {
                 player.toggleFade()
             } label: {
                 Label {
-                    Text("\(level) %").monospacedDigit()
+                    Text("\(state) · \(level) %").monospacedDigit()
                 } icon: {
                     Image(systemName: player.isLowered ? "speaker.wave.1" : "speaker.wave.2")
                 }
                 .labelStyle(.titleAndIcon)
                 .fixedSize()
             }
-            .buttonStyle(.borderedProminent)
-            .tint(player.isLowered ? Color.orange : Color.accentColor)
+            .buttonStyle(.bordered)
+            .foregroundStyle(player.isLowered ? Color.orange : Color.primary)
             .help(action)
             .accessibilityLabel(action)
-            .accessibilityValue("\(level) Prozent")
+            .accessibilityValue("\(state), \(level) Prozent")
 
             Button {
                 fadeSettingsPresentation.isOpen.toggle()
@@ -205,6 +208,7 @@ private struct JinglesView: View {
     private func jingleRow(_ file: URL) -> some View {
         let name = file.lastPathComponent
         let remaining = name == player.currentFilename ? player.remainingSeconds : nil
+        let isPlaying = remaining != nil && player.canPause
         let timeColor: Color = if name == player.selectedFilename {
             .primary
         } else if remaining != nil {
@@ -218,6 +222,7 @@ private struct JinglesView: View {
                 player.play(named: name)
             } label: {
                 Image(systemName: "play.fill")
+                    .foregroundStyle(isPlaying ? Color.mint : Color.secondary)
             }
             .help("„\(name)“ von Anfang an abspielen")
             .accessibilityLabel("„\(name)“ abspielen")
@@ -226,11 +231,15 @@ private struct JinglesView: View {
                 .truncationMode(.middle)
                 .help(name)
             Spacer()
+            Image(systemName: "waveform")
+                .foregroundStyle(Color.mint)
+                .opacity(isPlaying ? 1 : 0)
+                .accessibilityHidden(true)
             Text(timeLabel(remaining ?? player.durations[file]))
                 .monospacedDigit()
                 .foregroundStyle(timeColor)
                 .frame(minWidth: 42, alignment: .trailing)
-                .accessibilityLabel(remaining == nil ? "Dauer" : "Restzeit")
+                .accessibilityLabel(isPlaying ? "Läuft, Restzeit" : remaining == nil ? "Dauer" : "Restzeit")
                 .accessibilityValue(timeLabel(remaining ?? player.durations[file]))
             Button {
                 player.copyStreamDeckLink(for: name)

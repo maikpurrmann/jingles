@@ -1,78 +1,68 @@
 # Jingles
 
-macOS-Soundboard für Planlosgelöst. In **Jingles** über das Ordnersymbol oben rechts einmal einen Ordner auswählen. Die App zeigt dessen WAV- und MP3-Dateien an und spielt immer eine Datei über die aktuelle macOS-Tonausgabe ab. Über **Aktualisieren** liest sie den Ordner erneut ein. Unterordner bleiben außen vor. Das **Info-Symbol** öffnet die Bedienhilfe mit Version und Build-Datum.
+Jingles ist ein macOS-Soundboard für Podcasts und Live-Aufnahmen. Spiele WAV- und MP3-Dateien aus einem eigenen Ordner ab, steuere sie mit dem Stream Deck und zeichne sie in OBS auf einer eigenen Tonspur auf. Entstanden für den Podcast **Planlosgelöst**.
 
-In der App hält **Pause** die Wiedergabeposition. **Abspielen** setzt dort fort. **Stopp** setzt die Position zurück, damit das nächste **Abspielen** den Einspieler von Anfang an startet. Die Abspieltaste direkt neben einem Dateinamen startet die jeweilige Datei von Anfang an.
+## Download und Installation
 
-Ein Klick auf eine Zeile markiert den Jingle zur Vorauswahl. Die laufende Wiedergabe bleibt dabei erhalten. Die untere Taste **Abspielen** startet dann den markierten Jingle.
+**[Jingles 0.4.0 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.4.0/Jingles-0.4.0-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.4.0)
 
-Neben jedem Einspieler steht seine Dauer in Minuten und Sekunden. Beim laufenden Einspieler erscheinen ein türkises Play-Symbol und eine Wellenform neben der Restzeit. Die große Restzeit steht unten bei den runden Wiedergabetasten und dem Fortschrittsbalken. Bei **Pause** bleiben Zeit und Balken stehen. **Stopp** setzt die Anzeige unten auf `0:00` und zeigt in der Liste wieder die volle Dauer.
+Voraussetzung für den fertigen Download ist ein Mac mit Apple-Chip und macOS 13 Ventura oder neuer.
 
-## Version und Rückkehr zum bisherigen Teststand
+1. Die ZIP-Datei entpacken, `Jingles.app` in den gewünschten Programme-Ordner ziehen und öffnen. Bei einem Update zuerst Jingles beenden und die vorhandene App am bisherigen Ort ersetzen.
+2. Über das Ordnersymbol einen Ordner mit WAV- oder MP3-Dateien auswählen. Jingles spielt über die aktuelle macOS-Tonausgabe.
+3. Einen Einspieler über das Play-Symbol in seiner Zeile starten. Mit **Aktualisieren** liest Jingles den Ordner erneut ein.
 
-**Jingles 0.4.0 (Build 10)** enthält die freigegebene Oberfläche. Die installierte App liegt weiter unter `~/Applications/Jingles.app` und verwendet dieselbe App-Kennung, dieselben Einstellungen und dieselben Stream-Deck-Links auf Port `17639`.
+Der Download ist lokal signiert und bislang ohne Apple-Notarisierung. Wenn macOS das Öffnen beim ersten Start blockiert, bietet **Systemeinstellungen → Datenschutz & Sicherheit** unter Umständen **Dennoch öffnen** an. Prüfe vorher, dass die ZIP von diesem Release stammt. [Apple zur ersten Freigabe](https://support.apple.com/en-us/102445#openanyway)
 
-Der bisherige Teststand **0.3.2 (Build 9)** bleibt über den Git-Tag `v0.3.2` auf Commit `b0db819` und als lokale Kopie unter `~/Documents/Jingles-Teststand/Jingles-0.3.2-Planlosgeloest-Test.zip` verfügbar. Für eine Wiederherstellung das Archiv an einem separaten Ort entpacken, Jingles beenden und das App-Bundle am gewohnten Ort durch die entpackte App ersetzen. Die WAV-/MP3-Dateien und Einstellungen liegen außerhalb des App-Bundles.
+## Bedienung
 
-Vor der Aufnahme zuerst Jingles, dann OBS öffnen. Einen Einspieler und den Fade am Stream Deck auslösen und den Jingles-Kanal im OBS-Mixer prüfen. Nach dem Icon-Update auf 0.3.2 kam das Signal nach einem OBS-Neustart bei geöffneter Jingles-App zurück. Die gemeinsame Probe mit Christian umfasst den Empfang in VDO.Ninja, den Fade und eine kurze Aufnahme mit getrennten Mikrofon- und Jinglespuren.
+- Ein Klick auf die Zeile wählt den nächsten Jingle vor. Die laufende Wiedergabe geht weiter. Die untere Play-Taste startet die Vorauswahl. Das Play-Symbol in der Zeile startet diese Datei von vorn.
+- Der laufende Jingle hat ein türkises Play-Symbol und eine Wellenform. Die große Restzeit und der Fortschrittsbalken stehen bei den Wiedergabetasten. **Pause** hält die Position, **Stopp** setzt sie zurück.
+- Der Prozentknopf schaltet den globalen Jingle-Pegel zwischen **100 %** und dem eingestellten Zielpegel um. Der Pegel gilt auch für den nächsten Einspieler. Über das Regler-Symbol lassen sich Zielpegel und beide Fade-Zeiten einstellen. Die Vorgaben sind **10 %**, **0,3 s** abwärts und **3,0 s** aufwärts.
+- Über **ⓘ** findest du die Bedienhilfe sowie Version und Build-Datum.
 
-## App bauen und öffnen
+Jingles spielt jeweils eine Datei. Eigene Einspieler bleiben in deinem Soundboard-Ordner. Unterordner werden beim Einlesen übersprungen.
+
+## Stream Deck
+
+1. In Jingles das **Link-Symbol** in der Zeile des gewünschten Einspielers anklicken.
+2. Im Stream Deck eine Aktion **System → Webseite** anlegen, den Link einfügen und **GET-Anfrage im Hintergrund** wählen.
+3. Jingles geöffnet lassen. Ein Tastendruck startet die Datei, ein weiterer Druck stoppt sie. Eine andere Taste wechselt direkt zum nächsten Einspieler.
+
+In den Fade-Einstellungen kannst du den Link für den gemeinsamen Fade kopieren. Eine weitere Taste lässt sich mit dem Link für Play/Pause belegen.
+
+| Aktion | Lokaler Link |
+| --- | --- |
+| Einspieler starten oder stoppen | `http://127.0.0.1:17639/play/<dateiname>` |
+| Aktuellen Einspieler abspielen, pausieren oder fortsetzen | `http://127.0.0.1:17639/toggle` |
+| Jingle-Pegel absenken oder anheben | `http://127.0.0.1:17639/fade` |
+
+Die App erledigt beim Kopieren die URL-Kodierung des Dateinamens. Die Links gelten auf dem Mac, auf dem Jingles und Stream Deck laufen. Sie bleiben gültig, wenn du die Reihenfolge änderst oder eine Datei unter demselben Namen ersetzt. Nach dem Umbenennen einer Datei kopiere den Link erneut.
+
+## OBS
+
+1. Jingles öffnen. In OBS eine **macOS-Audioaufnahme** hinzufügen, **Anwendungsaudioaufnahme** wählen und **Jingles** als Anwendung auswählen.
+2. In den erweiterten Audioeigenschaften Jingles einer eigenen Aufnahmespur zuordnen, zum Beispiel **Spur 3**, und diese Spur in den Aufnahmeeinstellungen aktivieren. Das Mikrofon kann auf einer anderen Spur liegen.
+3. Eine kurze Probe aufnehmen. Prüfe im OBS-Mixer, ob der Jingles-Kanal ausschlägt, und kontrolliere die Spur in der Aufnahmedatei. Falls OBS nach einem Update keinen Pegel zeigt, prüfe die Anwendungsauswahl und starte OBS bei geöffneter Jingles-App neu.
+
+Der Fade wirkt auf den Ton der App. Das Mikrofon bleibt separat. [OBS-Anleitung zur Mehrspuraufnahme](https://obsproject.com/kb/multiple-audio-track-recording-guide)
+
+## Aus dem Quellcode bauen
+
+Jingles verwendet SwiftUI, AVFoundation und Network.framework. Mit den **Apple Command Line Tools** kannst du aus dem Repository bauen:
 
 ```sh
-./build.sh --install
-open "$HOME/Applications/Jingles.app"
+./build.sh
+open build/Jingles.app
 ```
 
-Der Build verwendet die macOS-Command-Line-Tools von Apple. Die lokal signierte App hat die Bundle-ID `de.maikpurrmann.jingles`. Für den OBS-Test immer die installierte App am selben Ort starten und vor einem Neubau beenden.
+Der Build landet als lokal signierte App unter `build/Jingles.app` und verwendet die Architektur des Macs, auf dem du baust. `./build.sh --install` installiert sie unter `~/Applications/Jingles.app`. Beende eine laufende Installation vor einem Update.
 
-### UI-Vorschau separat öffnen
-
-Für weitere Experimente einen separaten Branch und Git-Worktree anlegen und dort die Vorschau bauen:
+Für eine separat startbare Entwicklungsversion in einem eigenen Git-Worktree:
 
 ```sh
 ./build.sh --preview
 open "build/Jingles Vorschau.app"
 ```
 
-Die Vorschau hat eigene macOS-Einstellungen und verwendet für ihre kopierten Stream-Deck-Links Port `17640`. In der Vorschau den gewünschten Soundboard-Ordner auswählen. Die installierte App für den Aufnahmetest bleibt unter `~/Applications/Jingles.app` und reagiert weiterhin auf die vorhandenen Tasten auf Port `17639`.
-
-## Stream Deck
-
-1. Einer freien Taste **System → Webseite** zuweisen.
-2. In Jingles auf das **Link-Symbol** neben dem gewünschten Einspieler klicken und den kopierten Link als URL einfügen.
-3. **GET-Anfrage im Hintergrund** auswählen. Ein Druck startet den Einspieler. Ein weiterer Druck auf dieselbe Taste stoppt den laufenden Einspieler. Beim nächsten Druck beginnt er wieder von Anfang an. Die Taste eines anderen Einspielers wechselt direkt zu dieser Datei. Das funktioniert auch, wenn Jingles minimiert ist.
-
-Der Link verweist auf den Dateinamen im ausgewählten Ordner. Weitere Dateien und eine geänderte Sortierung beeinflussen ihn nicht. Bei einer gleichnamigen Ersatzdatei liest die App beim Neustart des Einspielers die neue Fassung. Nach einem Umbenennen, Löschen oder Ändern der Endung meldet die App die fehlende Datei. Nach einem Umbenennen den neuen Link kopieren.
-
-Die App muss dabei laufen. Maiks vorhandene Taste **Jingles** auf **Seite 4, zweite Reihe, vorletzte Spalte** verwendet weiterhin den folgenden Link für Play/Pause und setzt an derselben Stelle fort. Nach dem Öffnen verwendet sie den letzten Einspieler oder, bei einem neu ausgewählten Ordner, den ersten Eintrag.
-
-```sh
-curl -fsS http://127.0.0.1:17639/toggle
-```
-
-## Gemeinsamer Jingle-Fade
-
-Der Prozentknopf unten rechts wechselt zwischen **100 %** und dem eingestellten leisen Pegel. Die **Fade-Einstellungen** daneben merken sich Zielpegel sowie getrennte Zeiten fürs Absenken und Anheben. Die Startwerte sind **10 %**, **0,3 s** abwärts und **3,0 s** aufwärts. Bei jedem App-Start liegt der Pegel wieder bei 100 %.
-
-Der Fade liegt auf der gesamten Jingles-Ausgabe. Beim Wechsel des Einspielers gilt der aktuelle Pegel weiter. Der geregelte App-Ton geht direkt ans Audient. OBS erfasst denselben Ton für die Aufnahme und für den Sendemix über BlackHole zu VDO.Ninja. Der Mikrofonpegel bleibt separat.
-
-In den **Fade-Einstellungen** auf **Stream-Deck-Link kopieren** klicken und den Link `http://127.0.0.1:17639/fade` wie bei den Einspielern mit **System → Webseite → GET-Anfrage im Hintergrund** belegen. Ein Druck senkt ab, der nächste hebt an. App und Stream Deck schalten denselben Pegel um.
-
-## OBS
-
-1. Jingles öffnen und einen Einspieler kurz abspielen.
-2. In OBS **macOS-Audioaufnahme → Anwendungsaudioaufnahme → Jingles** als eigene Quelle wählen.
-3. Für die separate Jingle-Aufnahme die Quelle **Spur 3** zuordnen, bei Bedarf zusätzlich **Spur 1** für den Abhörmix. **Spur 2** ist für das Mikrofon vorgesehen.
-4. Jingles beenden und am selben Installationsort neu öffnen. Abspielen und prüfen, ob die vorhandene OBS-Quelle wieder ausschlägt. Eine kurze MKV-Probe zeigt, ob die Spurzuordnung stimmt.
-
-## Kopfhörer und VDO.Ninja
-
-Für den Kopfhörer am Audient iD14 das Audient als macOS-Tonausgabe verwenden. In OBS ist **BlackHole 2ch** das Monitoringgerät. Das Audiomonitoring für **Audient iD14** und **Jingles** aktivieren und in VDO.Ninja **BlackHole 2ch** als Audioeingang wählen.
-
-## Teststand vom 21.11.2026
-
-- OBS hat die App nach einem Jingles-Neustart wiedererkannt. Maiks MKV-Probe bestätigt **Spur 1 Abhörmix**, **Spur 2 Mikrofon** und **Spur 3 Jingles**.
-- Mit der Ordnerliste wurden `01_PLG_Intro.wav` und `02_PLG_Outro.mp3` über ihre Einzel-Links gestartet. Beide Einspieler sind in der OBS-Probe auf **Spur 3** nachweisbar. Maik bestätigte das Kopieren und Belegen der Links am Stream Deck. Die aktualisierte Start-/Stopp-Logik verwendet dieselben Links.
-- In **0.2.4** animiert die App den Fortschrittsbalken durchgehend. Der Countdown aktualisiert sich separat. Linearer Fortschritt, Pause, Fortsetzen und Rücksetzen wurden geprüft. Maik bestätigte, dass die Anzeige deutlich flüssiger läuft.
-- In **0.3.0** bestätigte die OBS-Aufnahme `2026-11-21 22-16-43.mkv` auf Spur 3 das Absenken auf etwa **10 % des Normalpegels**, den leisen Start des nächsten Einspielers und das Anheben über etwa **3 s**. Die Befehle liefen über den kopierten Fade-Link. Maik bestätigte anschließend auch den Test am physischen Stream Deck. Der Hörvergleich bei Christian steht aus.
-- Maik hat die WAV über VDO.Ninja auf seinem MacBook als Gegenstelle gehört. Der gemeinsame Hörtest mit Christian ist offen.
+Die Vorschau hat eigene Einstellungen und Port `17640`. Die normale App verwendet die Bundle-ID `de.maikpurrmann.jingles` und Port `17639`.

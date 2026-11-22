@@ -24,7 +24,11 @@ enum StreamDeckCommand {
     case fade
 
     static let host = "127.0.0.1"
-    static let port: NWEndpoint.Port = 17639
+    static let port: NWEndpoint.Port = {
+        guard let value = Bundle.main.object(forInfoDictionaryKey: "JinglesStreamDeckPort") as? Int,
+              let rawPort = UInt16(exactly: value), rawPort > 0 else { return 17639 }
+        return NWEndpoint.Port(rawValue: rawPort) ?? 17639
+    }()
     private static let playPrefix = "/play/"
     private static let filenameCharacters = CharacterSet(
         charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"

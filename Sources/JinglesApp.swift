@@ -3,6 +3,7 @@ import SwiftUI
 
 @main
 struct JinglesApp: App {
+    @NSApplicationDelegateAdaptor(JinglesApplicationDelegate.self) private var applicationDelegate
     @StateObject private var player = JinglePlayer()
 
     var body: some Scene {
@@ -11,6 +12,15 @@ struct JinglesApp: App {
         }
         .defaultSize(width: 620, height: 470)
         .windowResizability(.contentMinSize)
+    }
+}
+
+private final class JinglesApplicationDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        guard let application = notification.object as? NSApplication,
+              let url = Bundle.main.url(forResource: "AppIcon", withExtension: "icns"),
+              let icon = NSImage(contentsOf: url) else { return }
+        application.applicationIconImage = icon
     }
 }
 

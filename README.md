@@ -8,6 +8,24 @@ Ein Klick auf eine Zeile markiert den Jingle zur Vorauswahl. Die laufende Wieder
 
 Neben jedem Einspieler steht seine Dauer in Minuten und Sekunden. Beim laufenden Einspieler zählt die Anzeige die Restzeit herunter. Unten stehen die Restzeit und ein Fortschrittsbalken. Bei **Pause** bleiben beide stehen. **Stopp** setzt den Fortschritt zurück und zeigt in der Liste wieder die volle Dauer.
 
+## Fester Stand für den Planlosgelöst-Test
+
+Für die gemeinsame Probe mit Christian ist **Jingles 0.3.2 (Build 9)** vorgesehen. Der Git-Tag `v0.3.2` zeigt auf den Quellstand `b0db819` vom 22.11.2026. Die Test-App liegt bei Maik unter `~/Applications/Jingles.app`. Eine Kopie des installierten App-Bundles liegt lokal als `~/Documents/Jingles-Teststand/Jingles-0.3.2-Planlosgeloest-Test.zip`. Für eine Wiederherstellung das Archiv zunächst an einem separaten Ort entpacken und die beendete Test-App am gewohnten Installationsort durch die entpackte App ersetzen. Die WAV-/MP3-Dateien und die Einstellungen gehören zur lokalen Einrichtung außerhalb des App-Bundles.
+
+Vor der Aufnahme zuerst Jingles, dann OBS öffnen. Einen Einspieler und den Fade am Stream Deck auslösen und den Jingles-Kanal im OBS-Mixer prüfen. Nach dem Icon-Update auf 0.3.2 kam das Signal nach einem OBS-Neustart bei geöffneter Jingles-App zurück. Die gemeinsame Probe mit Christian umfasst den Empfang in VDO.Ninja, den Fade und eine kurze Aufnahme mit getrennten Mikrofon- und Jinglespuren.
+
+### Änderungen separat ausprobieren
+
+Für die erste UI-Variante einen separaten Git-Worktree vom Test-Tag anlegen. Aus dem bestehenden Repository heraus:
+
+```sh
+git worktree add -b experiment/ui ../Jingles-UI v0.3.2
+cd ../Jingles-UI
+./build.sh
+```
+
+Der Build ohne `--install` landet im Worktree unter `build/Jingles.app`. Für einen parallelen Lauf bekommt die Variante vor dem ersten Start einen eigenen App-Namen, eine eigene Bundle-ID für separate macOS-Einstellungen und einen eigenen lokalen Stream-Deck-Port. Die installierte Test-App behält ihre Identität für OBS und ihre vorhandenen Stream-Deck-Links auf Port `17639`. Änderungen aus dem Experiment werden nach der gemeinsamen Aufnahmeprobe und nach Freigabe für eine neue Version übernommen.
+
 ## App bauen und öffnen
 
 ```sh

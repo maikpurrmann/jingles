@@ -1,30 +1,20 @@
 # Jingles
 
-Kleiner macOS-Prototyp für Planlosgelöst. In **Jingles** über das Ordnersymbol oben rechts einmal einen Ordner auswählen. Die App zeigt dessen WAV- und MP3-Dateien an und spielt immer eine Datei über die aktuelle macOS-Tonausgabe ab. Über **Aktualisieren** liest sie den Ordner erneut ein. Unterordner bleiben außen vor.
+macOS-Soundboard für Planlosgelöst. In **Jingles** über das Ordnersymbol oben rechts einmal einen Ordner auswählen. Die App zeigt dessen WAV- und MP3-Dateien an und spielt immer eine Datei über die aktuelle macOS-Tonausgabe ab. Über **Aktualisieren** liest sie den Ordner erneut ein. Unterordner bleiben außen vor. Das **Info-Symbol** öffnet die Bedienhilfe mit Version und Build-Datum.
 
 In der App hält **Pause** die Wiedergabeposition. **Abspielen** setzt dort fort. **Stopp** setzt die Position zurück, damit das nächste **Abspielen** den Einspieler von Anfang an startet. Die Abspieltaste direkt neben einem Dateinamen startet die jeweilige Datei von Anfang an.
 
 Ein Klick auf eine Zeile markiert den Jingle zur Vorauswahl. Die laufende Wiedergabe bleibt dabei erhalten. Die untere Taste **Abspielen** startet dann den markierten Jingle.
 
-Neben jedem Einspieler steht seine Dauer in Minuten und Sekunden. Beim laufenden Einspieler zählt die Anzeige die Restzeit herunter. Unten stehen die Restzeit und ein Fortschrittsbalken. Bei **Pause** bleiben beide stehen. **Stopp** setzt den Fortschritt zurück und zeigt in der Liste wieder die volle Dauer.
+Neben jedem Einspieler steht seine Dauer in Minuten und Sekunden. Beim laufenden Einspieler erscheinen ein türkises Play-Symbol und eine Wellenform neben der Restzeit. Die große Restzeit steht unten bei den runden Wiedergabetasten und dem Fortschrittsbalken. Bei **Pause** bleiben Zeit und Balken stehen. **Stopp** setzt die Anzeige unten auf `0:00` und zeigt in der Liste wieder die volle Dauer.
 
-## Fester Stand für den Planlosgelöst-Test
+## Version und Rückkehr zum bisherigen Teststand
 
-Für die gemeinsame Probe mit Christian ist **Jingles 0.3.2 (Build 9)** vorgesehen. Der Git-Tag `v0.3.2` zeigt auf den Quellstand `b0db819` vom 22.11.2026. Die Test-App liegt bei Maik unter `~/Applications/Jingles.app`. Eine Kopie des installierten App-Bundles liegt lokal als `~/Documents/Jingles-Teststand/Jingles-0.3.2-Planlosgeloest-Test.zip`. Für eine Wiederherstellung das Archiv zunächst an einem separaten Ort entpacken und die beendete Test-App am gewohnten Installationsort durch die entpackte App ersetzen. Die WAV-/MP3-Dateien und die Einstellungen gehören zur lokalen Einrichtung außerhalb des App-Bundles.
+**Jingles 0.4.0 (Build 10)** enthält die freigegebene Oberfläche. Die installierte App liegt weiter unter `~/Applications/Jingles.app` und verwendet dieselbe App-Kennung, dieselben Einstellungen und dieselben Stream-Deck-Links auf Port `17639`.
+
+Der bisherige Teststand **0.3.2 (Build 9)** bleibt über den Git-Tag `v0.3.2` auf Commit `b0db819` und als lokale Kopie unter `~/Documents/Jingles-Teststand/Jingles-0.3.2-Planlosgeloest-Test.zip` verfügbar. Für eine Wiederherstellung das Archiv an einem separaten Ort entpacken, Jingles beenden und das App-Bundle am gewohnten Ort durch die entpackte App ersetzen. Die WAV-/MP3-Dateien und Einstellungen liegen außerhalb des App-Bundles.
 
 Vor der Aufnahme zuerst Jingles, dann OBS öffnen. Einen Einspieler und den Fade am Stream Deck auslösen und den Jingles-Kanal im OBS-Mixer prüfen. Nach dem Icon-Update auf 0.3.2 kam das Signal nach einem OBS-Neustart bei geöffneter Jingles-App zurück. Die gemeinsame Probe mit Christian umfasst den Empfang in VDO.Ninja, den Fade und eine kurze Aufnahme mit getrennten Mikrofon- und Jinglespuren.
-
-### Änderungen separat ausprobieren
-
-Für die erste UI-Variante einen separaten Git-Worktree vom Test-Tag anlegen. Aus dem bestehenden Repository heraus:
-
-```sh
-git worktree add -b experiment/ui ../Jingles-UI v0.3.2
-cd ../Jingles-UI
-./build.sh
-```
-
-Der Build ohne `--install` landet im Worktree unter `build/Jingles.app`. Für einen parallelen Lauf bekommt die Variante vor dem ersten Start einen eigenen App-Namen, eine eigene Bundle-ID für separate macOS-Einstellungen und einen eigenen lokalen Stream-Deck-Port. Die installierte Test-App behält ihre Identität für OBS und ihre vorhandenen Stream-Deck-Links auf Port `17639`. Änderungen aus dem Experiment werden nach der gemeinsamen Aufnahmeprobe und nach Freigabe für eine neue Version übernommen.
 
 ## App bauen und öffnen
 
@@ -36,6 +26,8 @@ open "$HOME/Applications/Jingles.app"
 Der Build verwendet die macOS-Command-Line-Tools von Apple. Die lokal signierte App hat die Bundle-ID `de.maikpurrmann.jingles`. Für den OBS-Test immer die installierte App am selben Ort starten und vor einem Neubau beenden.
 
 ### UI-Vorschau separat öffnen
+
+Für weitere Experimente einen separaten Branch und Git-Worktree anlegen und dort die Vorschau bauen:
 
 ```sh
 ./build.sh --preview

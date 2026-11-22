@@ -17,6 +17,15 @@ open "$HOME/Applications/Jingles.app"
 
 Der Build verwendet die macOS-Command-Line-Tools von Apple. Die lokal signierte App hat die Bundle-ID `de.maikpurrmann.jingles`. Für den OBS-Test immer die installierte App am selben Ort starten und vor einem Neubau beenden.
 
+### UI-Vorschau separat öffnen
+
+```sh
+./build.sh --preview
+open "build/Jingles Vorschau.app"
+```
+
+Die Vorschau hat eigene macOS-Einstellungen und verwendet für ihre kopierten Stream-Deck-Links Port `17640`. In der Vorschau den gewünschten Soundboard-Ordner auswählen. Die installierte App für den Aufnahmetest bleibt unter `~/Applications/Jingles.app` und reagiert weiterhin auf die vorhandenen Tasten auf Port `17639`.
+
 ## Stream Deck
 
 1. Einer freien Taste **System → Webseite** zuweisen.

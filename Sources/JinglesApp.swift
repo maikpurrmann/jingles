@@ -7,7 +7,7 @@ struct JinglesApp: App {
     @StateObject private var player = JinglePlayer()
 
     var body: some Scene {
-        Window("Jingles", id: "player") {
+        Window(Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "Jingles", id: "player") {
             JinglesView(player: player)
         }
         .defaultSize(width: 620, height: 470)

@@ -27,6 +27,20 @@ Jingles spielt jeweils eine Datei. Eigene Einspieler bleiben in deinem Soundboar
 
 ## Stream Deck
 
+### Plugin mit Statusanzeige
+
+Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade die Datei `.streamDeckPlugin` aus demselben [GitHub-Release](https://github.com/maikpurrmann/jingles/releases) wie die App. Öffne die heruntergeladene Datei per Doppelklick.
+
+1. Jingles öffnen und den Einspielerordner wählen.
+2. Im Stream Deck die Aktion **Jingles → Jingle** auf einen Tastenplatz ziehen. In den Einstellungen der Taste unter **Einspieler** die gewünschte Datei wählen. Für weitere Einspieler kannst du jeweils eine weitere Taste belegen.
+3. Die Aktion **Jingles → Fade** auf einen Tastenplatz ziehen. Bei beiden Aktionen ist unter **App** standardmäßig **Jingles** eingestellt. Für einen Test mit dem separaten Vorschau-Build wählst du hier **Jingles Vorschau**.
+
+Die Jingle-Taste ist hervorgehoben, solange ihre Datei spielt. Ein weiterer Druck stoppt sie. Die Fade-Taste zeigt die aktive Pegelabsenkung auch zwischen zwei Einspielern. Beide Anzeigen folgen auch Änderungen im App-Fenster.
+
+Wenn in der Dateiauswahl ein neuer Einspieler fehlt, aktualisiere den Ordner in Jingles und klicke in den Tasteneinstellungen auf **Neu laden**.
+
+### Steuerung über Links
+
 1. In Jingles das **Link-Symbol** in der Zeile des gewünschten Einspielers anklicken.
 2. Im Stream Deck eine Aktion **System → Webseite** anlegen, den Link einfügen und **GET-Anfrage im Hintergrund** wählen.
 3. Jingles geöffnet lassen. Ein Tastendruck startet die Datei, ein weiterer Druck stoppt sie. Eine andere Taste wechselt direkt zum nächsten Einspieler.
@@ -68,3 +82,13 @@ open "build/Jingles Vorschau.app"
 ```
 
 Die Vorschau hat eigene Einstellungen und Port `17640`. Die normale App verwendet die Bundle-ID `de.maikpurrmann.jingles` und Port `17639`.
+
+Das Plugin baust und paketierst du mit Node.js 24:
+
+```sh
+cd stream-deck
+npm ci
+npm run package
+```
+
+Der Installer liegt danach unter `build/de.maikpurrmann.jingles.streamDeckPlugin` im Repository.

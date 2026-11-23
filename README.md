@@ -37,7 +37,7 @@ Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade die Datei `.st
 
 Unter **App** ist bei allen drei Aktionen **Jingles** voreingestellt. Für einen Test mit dem separaten Vorschau-Build wählst du **Jingles Vorschau**.
 
-Die Taste ist standardmäßig mit **Jingle** beschriftet. Gib im Stream-Deck-Feld **Titel** deinen eigenen Namen ein. Verknüpfe die Titel der beiden Zustände, damit der Name beim Starten und Stoppen gleich bleibt. Der grüne Rand zeigt an, welcher Jingle gerade spielt. Ein weiterer Druck stoppt ihn.
+Die Taste ist standardmäßig mit **Jingle** beschriftet. Gib im Stream-Deck-Feld **Titel** deinen eigenen Namen ein. Verknüpfe die Titel der beiden Zustände, damit der Name beim Starten und Stoppen gleich bleibt. Der grüne Rand zeigt an, welcher Jingle gerade spielt. Er läuft im Uhrzeigersinn ab und zeigt so den Wiedergabefortschritt. Ein weiterer Druck stoppt den Jingle.
 
 Die schwarze **Fade**-Taste bekommt bei aktiver Pegelabsenkung einen orangefarbenen Rand. Beide Tasten zeigen auch Änderungen aus dem App-Fenster an. Falls du eigene Tastenbilder gesetzt hast, setze sie für beide Zustände auf die Plugin-Bilder zurück, damit die Ränder erscheinen.
 

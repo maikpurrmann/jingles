@@ -4,13 +4,19 @@ import streamDeck, {
 } from "@elgato/streamdeck";
 
 type Settings = { filename?: string; preview?: boolean };
-type Status = { playingFilename: string | null; isLowered: boolean; remainingSeconds?: number | null };
+type Status = {
+    playingFilename: string | null;
+    isLowered: boolean;
+    remainingSeconds?: number | null;
+    playbackProgress?: number | null;
+};
 type Kind = "jingle" | "fade" | "countdown";
 type VisibleKey = {
     key: KeyAction<Settings>;
     kind: Kind;
     settings: Settings;
     state?: 0 | 1;
+    progressStep?: number;
     title?: string;
 };
 
@@ -49,6 +55,22 @@ function countdownTitle(status?: Status): string {
     return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
+const progressSteps = 40;
+const borderLength = 4 * (25 + 2 * Math.PI);
+
+function progressBorder(step: number): string {
+    // The rounded square starts at the top center and runs clockwise.
+    const elapsed = borderLength * step / progressSteps;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 36 36">
+        <rect width="36" height="36" fill="#000"/>
+        <path d="M18 1.5 H30.5 A4 4 0 0 1 34.5 5.5 V30.5 A4 4 0 0 1 30.5 34.5 H5.5
+                 A4 4 0 0 1 1.5 30.5 V5.5 A4 4 0 0 1 5.5 1.5 H18"
+              fill="none" stroke="#38d58d" stroke-width="2.5" stroke-linecap="round"
+              stroke-dasharray="${(borderLength - elapsed).toFixed(3)} ${borderLength.toFixed(3)}"
+              stroke-dashoffset="${(-elapsed).toFixed(3)}"/>
+    </svg>`;
+}
+
 async function poll(): Promise<void> {
     polling = true;
     try {
@@ -74,6 +96,16 @@ async function poll(): Promise<void> {
                 const active = entry.kind === "fade"
                     ? status?.isLowered === true
                     : typeof status?.playingFilename === "string" && status.playingFilename === entry.settings.filename;
+                if (active && entry.kind === "jingle") {
+                    const progress = status?.playbackProgress;
+                    const step = typeof progress === "number" && Number.isFinite(progress)
+                        ? Math.min(progressSteps - 1, Math.max(0, Math.floor(progress * progressSteps)))
+                        : 0;
+                    if (entry.progressStep !== step) {
+                        await entry.key.setImage(step === 0 ? undefined : progressBorder(step), { state: 1 });
+                        entry.progressStep = step;
+                    }
+                }
                 const state = active ? 1 : 0;
                 if (entry.state !== state) {
                     await entry.key.setState(state);

@@ -6,9 +6,8 @@
   <style>
     body { color-scheme: dark; color: #ddd; background: #2d2d2d; font: 12px system-ui; margin: 10px; }
     label { display: block; margin-bottom: 4px; }
-    select, button, input { color: inherit; font: inherit; }
-    select, input { box-sizing: border-box; width: 100%; }
-    .title-label { margin-top: 10px; }
+    select, button { color: inherit; font: inherit; }
+    select { width: 100%; }
     .row { display: flex; gap: 5px; }
     .row select { min-width: 0; }
     section { margin-top: 12px; }
@@ -31,8 +30,6 @@
       <button type="button" id="reload" disabled>Neu laden</button>
     </div>
     <p id="status" role="status"></p>
-    <label class="title-label" for="key-title">Titel auf der Taste</label>
-    <input id="key-title" type="text" disabled>
   </section>
 </body>
 </html>

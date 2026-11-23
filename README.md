@@ -77,6 +77,8 @@ Ab Jingles 0.5.3 liefert `http://127.0.0.1:17639/obs/jingle` eine transparente R
 
 Wenn der Countdown nur im Gesprächsbild sichtbar sein soll, lege in OBS eine Szene **Ninja** an und binde die Aufnahmeszene als Szenenquelle ein. Füge darüber die Browserquelle hinzu. Wähle in den Einstellungen der virtuellen Kamera **Szene → Ninja**. Die OBS-Aufnahme verwendet die normale Programmszene. VDO.Ninja verwendet **OBS Virtual Camera** als Kamera. [OBS zur virtuellen Kamera](https://obsproject.com/kb/virtual-camera-guide)
 
+Für die **Aufnahmezeit** lege `obs/RecordingTimer.lua` und `obs/RecordingTimer.html` gemeinsam in einem beschreibbaren Ordner ab. Lade die Lua-Datei über **Werkzeuge → Skripte**. Füge die HTML-Datei als lokale Browserquelle in **Ninja** hinzu. Verwende für beide Einblendungen dieselben Quellabmessungen und richte die Aufnahmezeit am rechten Bildrand aus. Die Uhr läuft direkt in OBS.
+
 ## Aus dem Quellcode bauen
 
 Jingles verwendet SwiftUI, AVFoundation und Network.framework. Mit den **Apple Command Line Tools** kannst du aus dem Repository bauen:

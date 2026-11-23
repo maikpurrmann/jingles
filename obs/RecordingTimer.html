@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>OBS-Aufnahmezeit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    --unit: calc(100vw / 240);
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+    color: #fff;
+    font: 600 calc(27 * var(--unit))/1 system-ui, sans-serif;
+  }
+  #overlay {
+    display: flex;
+    align-items: center;
+    gap: calc(12 * var(--unit));
+    width: max-content;
+    max-width: 100%;
+    min-height: calc(52 * var(--unit));
+    border-radius: calc(12 * var(--unit));
+    padding: calc(7 * var(--unit)) calc(14 * var(--unit));
+    background: rgba(14, 21, 21, .92);
+  }
+  #overlay[hidden] { display: none; }
+  #overlay::before {
+    content: "";
+    flex: none;
+    width: calc(9 * var(--unit));
+    height: calc(9 * var(--unit));
+    border-radius: 50%;
+    background: #ff4545;
+  }
+  #time { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div id="overlay" hidden><span id="time"></span></div>
+<script>
+  const overlay = document.getElementById("overlay");
+  const time = document.getElementById("time");
+
+  async function update() {
+    try {
+      const response = await fetch(`recording-status.json?t=${Date.now()}`, {
+        cache: "no-store", signal: AbortSignal.timeout(800)
+      });
+      if (!response.ok) throw new Error("OBS recording status unavailable");
+      const elapsed = await response.json();
+      if (Number.isSafeInteger(elapsed) && elapsed >= 0) {
+        const hours = Math.floor(elapsed / 3600);
+        const minutes = Math.floor(elapsed / 60) % 60;
+        const seconds = elapsed % 60;
+        time.textContent = [hours, minutes, seconds].map(part => String(part).padStart(2, "0")).join(":");
+        overlay.hidden = false;
+      } else {
+        overlay.hidden = true;
+      }
+    } catch {
+      overlay.hidden = true;
+    }
+    setTimeout(update, 250);
+  }
+
+  update();
+</script>
+</body>
+</html>

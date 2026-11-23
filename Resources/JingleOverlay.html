@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Jingle-Restzeit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #fff; font: 600 21px system-ui, sans-serif; }
+  #overlay {
+    display: flex; align-items: center; gap: 12px;
+    width: max-content; max-width: 100%; min-height: 52px;
+    border-radius: 12px; padding: 7px 14px;
+    background: rgba(14, 21, 21, .92);
+  }
+  #overlay[hidden] { display: none; }
+  #overlay::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #38d58d; }
+  #time { font-variant-numeric: tabular-nums; font-size: 27px; line-height: 1; }
+</style>
+</head>
+<body>
+<div id="overlay" hidden>Jingle <span id="time"></span></div>
+<script>
+  const overlay = document.getElementById("overlay");
+  const time = document.getElementById("time");
+
+  async function update() {
+    try {
+      const response = await fetch("/obs/jingle/status", {
+        cache: "no-store", signal: AbortSignal.timeout(800)
+      });
+      if (!response.ok) throw new Error("Jingles unavailable");
+      const { remainingSeconds } = await response.json();
+      if (Number.isSafeInteger(remainingSeconds) && remainingSeconds > 0) {
+        const seconds = String(remainingSeconds % 60).padStart(2, "0");
+        time.textContent = `${Math.floor(remainingSeconds / 60)}:${seconds}`;
+        overlay.hidden = false;
+      } else {
+        overlay.hidden = true;
+      }
+    } catch {
+      overlay.hidden = true;
+    }
+    setTimeout(update, 250);
+  }
+
+  update();
+</script>
+</body>
+</html>

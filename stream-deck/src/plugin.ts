@@ -15,7 +15,7 @@ type VisibleKey = {
     key: KeyAction<Settings>;
     kind: Kind;
     settings: Settings;
-    state?: 0 | 1;
+    fadeActive?: boolean;
     progressStep?: number;
     title?: string;
 };
@@ -111,10 +111,11 @@ async function poll(): Promise<void> {
                     }
                     continue;
                 }
-                const state = status?.isLowered === true ? 1 : 0;
-                if (entry.state !== state) {
-                    await entry.key.setState(state);
-                    entry.state = state;
+                const fadeActive = status?.isLowered === true;
+                if (entry.fadeActive !== fadeActive) {
+                    const image = fadeActive ? "images/fade-on.svg" : undefined;
+                    await entry.key.setImage(image, { target: Target.HardwareAndSoftware });
+                    entry.fadeActive = fadeActive;
                 }
             }
         }));

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Jingles</title>
+  <style>
+    body { color-scheme: dark; color: #ddd; background: #2d2d2d; font: 12px system-ui; margin: 10px; }
+    label { display: block; margin-bottom: 4px; }
+    select, button { color: inherit; font: inherit; }
+    select { width: 100%; }
+    .row { display: flex; gap: 5px; }
+    .row select { min-width: 0; }
+    section { margin-top: 12px; }
+    p { margin: 6px 0 0; }
+  </style>
+  <script defer src="inspector.js"></script>
+</head>
+<body>
+  <label for="app">App</label>
+  <select id="app" disabled>
+    <option value="release">Jingles</option>
+    <option value="preview">Jingles Vorschau</option>
+  </select>
+  <section id="jingle" hidden>
+    <label for="filename">Einspieler</label>
+    <div class="row">
+      <select id="filename" disabled>
+        <option value="">Einspieler auswählen</option>
+      </select>
+      <button type="button" id="reload" disabled>Neu laden</button>
+    </div>
+    <p id="status" role="status"></p>
+  </section>
+</body>
+</html>

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+  "UUID": "de.maikpurrmann.jingles",
+  "Name": "Jingles",
+  "Author": "Maik Purrmann",
+  "Description": "Jingles und Pegelabsenkung steuern und ihren Status anzeigen.",
+  "Version": "0.5.0.0",
+  "Icon": "images/plugin",
+  "Category": "Jingles",
+  "CategoryIcon": "images/action",
+  "URL": "https://github.com/maikpurrmann/jingles",
+  "CodePath": "bin/plugin.mjs",
+  "PropertyInspectorPath": "inspector/index.html",
+  "SDKVersion": 2,
+  "Nodejs": {
+    "Version": "24"
+  },
+  "Software": {
+    "MinimumVersion": "7.1"
+  },
+  "OS": [
+    {
+      "Platform": "mac",
+      "MinimumVersion": "13"
+    }
+  ],
+  "Actions": [
+    {
+      "UUID": "de.maikpurrmann.jingles.jingle",
+      "Name": "Jingle",
+      "Icon": "images/action",
+      "Tooltip": "Einen Einspieler starten oder stoppen.",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "SupportedInMultiActions": false,
+      "States": [
+        {
+          "Image": "images/jingle-off",
+          "Name": "Bereit"
+        },
+        {
+          "Image": "images/jingle-on",
+          "Name": "Spielt"
+        }
+      ]
+    },
+    {
+      "UUID": "de.maikpurrmann.jingles.fade",
+      "Name": "Fade",
+      "Icon": "images/fade-action",
+      "Tooltip": "Die Pegelabsenkung ein- oder ausschalten.",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "SupportedInMultiActions": false,
+      "States": [
+        {
+          "Image": "images/fade-off",
+          "Name": "Normal"
+        },
+        {
+          "Image": "images/fade-on",
+          "Name": "Abgesenkt"
+        }
+      ]
+    }
+  ]
+}

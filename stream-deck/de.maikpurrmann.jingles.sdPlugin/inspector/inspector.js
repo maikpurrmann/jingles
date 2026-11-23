@@ -1,5 +1,6 @@
 const app = document.getElementById("app");
 const filename = document.getElementById("filename");
+const keyTitle = document.getElementById("key-title");
 const reload = document.getElementById("reload");
 const status = document.getElementById("status");
 
@@ -30,6 +31,11 @@ window.connectElgatoStreamDeckSocket = (port, uuid, registrationEvent, _info, ac
         filename.disabled = !filenames;
     }
 
+    function showKeyTitle() {
+        keyTitle.value = settings.keyTitle ?? settings.filename ?? "";
+        keyTitle.disabled = socket.readyState !== WebSocket.OPEN || !settings.filename;
+    }
+
     function loadFilenames() {
         if (!isJingle) return;
         latestRequest = crypto.randomUUID();
@@ -42,11 +48,13 @@ window.connectElgatoStreamDeckSocket = (port, uuid, registrationEvent, _info, ac
     }
 
     showFilenames(null);
+    showKeyTitle();
 
     socket.onopen = () => {
         socket.send(JSON.stringify({ event: registrationEvent, uuid }));
         app.disabled = false;
         reload.disabled = false;
+        showKeyTitle();
         loadFilenames();
     };
 
@@ -70,7 +78,18 @@ window.connectElgatoStreamDeckSocket = (port, uuid, registrationEvent, _info, ac
 
     filename.onchange = () => {
         settings.filename = filename.value;
+        showKeyTitle();
         send("setSettings", settings);
+    };
+    keyTitle.onchange = () => {
+        const value = keyTitle.value.trim();
+        if (value && value !== settings.filename) settings.keyTitle = value;
+        else delete settings.keyTitle;
+        showKeyTitle();
+        send("setSettings", settings);
+    };
+    keyTitle.onkeydown = (event) => {
+        if (event.key === "Enter") keyTitle.blur();
     };
     reload.onclick = loadFilenames;
 };

@@ -3,14 +3,15 @@ import streamDeck, {
     type SendToPluginEvent, SingletonAction, type WillAppearEvent, type WillDisappearEvent
 } from "@elgato/streamdeck";
 
-type Settings = { filename?: string; preview?: boolean };
+type Settings = { filename?: string; keyTitle?: string; preview?: boolean };
 type Status = { playingFilename: string | null; isLowered: boolean; remainingSeconds?: number | null };
 type Kind = "jingle" | "fade" | "countdown";
 type VisibleKey = {
     key: KeyAction<Settings>;
     kind: Kind;
     settings: Settings;
-    display?: 0 | 1 | string;
+    state?: 0 | 1;
+    title?: string;
 };
 
 const ports = [17639, 17640] as const;
@@ -43,9 +44,45 @@ function schedulePoll(delay: number): void {
 function countdownTitle(status?: Status): string {
     const seconds = status?.remainingSeconds;
     if (!status?.playingFilename || typeof seconds !== "number" || !Number.isSafeInteger(seconds) || seconds < 0) {
-        return "";
+        return "0:00";
     }
     return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+const titleSegments = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+
+function titleCharacterWidth(character: string): number {
+    // Approximate proportional widths for the 14 pt title inside the key's border.
+    if (/^[ijlI1 .,:;!'|]$/.test(character)) return 0.35;
+    if (/^[MW@%]$/.test(character)) return 1;
+    if (/^[A-Z]$/.test(character)) return 0.78;
+    return /^[\u0020-\u024f]$/.test(character) ? 0.65 : 1.1;
+}
+
+function jingleTitle(settings: Settings): string {
+    const title = (settings.keyTitle ?? settings.filename ?? "").replace(/\s+/g, " ").trim();
+    const characters = Array.from(titleSegments.segment(title), ({ segment }) => segment);
+    const lines: string[] = [];
+    let offset = 0;
+    for (let row = 0; row < 2 && offset < characters.length; row++) {
+        const start = offset;
+        let width = 0;
+        while (offset < characters.length) {
+            const nextWidth = titleCharacterWidth(characters[offset]);
+            if (width + nextWidth > 4) break;
+            width += nextWidth;
+            offset++;
+        }
+        const truncated = row === 1 && offset < characters.length;
+        if (truncated) {
+            while (width + 1 > 4) {
+                width -= titleCharacterWidth(characters[--offset]);
+            }
+        }
+        const line = characters.slice(start, offset).join("").trim();
+        lines.push(truncated ? line + "…" : line);
+    }
+    return lines.join("\n");
 }
 
 async function poll(): Promise<void> {
@@ -62,21 +99,21 @@ async function poll(): Promise<void> {
             }
             for (const entry of visibleKeys.values()) {
                 if (portFor(entry.settings) !== port) continue;
-                if (entry.kind === "countdown") {
-                    const title = countdownTitle(status);
-                    if (entry.display !== title) {
+                if (entry.kind !== "fade") {
+                    const title = entry.kind === "countdown" ? countdownTitle(status) : jingleTitle(entry.settings);
+                    if (entry.title !== title) {
                         await entry.key.setTitle(title);
-                        entry.display = title;
+                        entry.title = title;
                     }
-                    continue;
                 }
+                if (entry.kind === "countdown") continue;
                 const active = entry.kind === "fade"
                     ? status?.isLowered === true
                     : typeof status?.playingFilename === "string" && status.playingFilename === entry.settings.filename;
                 const state = active ? 1 : 0;
-                if (entry.display !== state) {
+                if (entry.state !== state) {
                     await entry.key.setState(state);
-                    entry.display = state;
+                    entry.state = state;
                 }
             }
         }));

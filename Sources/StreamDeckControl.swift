@@ -18,7 +18,31 @@ enum PlaybackResult {
     }
 }
 
+struct StreamDeckResponse {
+    let status: String
+    let body: Data
+    let contentType: String
+
+    init(status: String, text: String) {
+        self.status = status
+        body = Data(text.utf8)
+        contentType = "text/plain; charset=utf-8"
+    }
+
+    init(json: [String: Any]) {
+        do {
+            body = try JSONSerialization.data(withJSONObject: json)
+            status = "200 OK"
+            contentType = "application/json; charset=utf-8"
+        } catch {
+            self = Self(status: "500 Internal Server Error", text: "unable to encode response")
+        }
+    }
+}
+
 enum StreamDeckCommand {
+    case status
+    case jingles
     case toggle
     case play(String)
     case fade
@@ -35,6 +59,14 @@ enum StreamDeckCommand {
     )
 
     init?(target: String) {
+        if target == "/status" {
+            self = .status
+            return
+        }
+        if target == "/jingles" {
+            self = .jingles
+            return
+        }
         if target == "/toggle" {
             self = .toggle
             return
@@ -54,6 +86,8 @@ enum StreamDeckCommand {
     var link: String? {
         let root = "http://\(Self.host):\(Self.port)"
         switch self {
+        case .status, .jingles:
+            return nil
         case .toggle:
             return root + "/toggle"
         case .fade:
@@ -73,7 +107,7 @@ final class StreamDeckControl {
     private let maxHeaderBytes = 8192
     private var listener: NWListener?
 
-    func start(handle: @escaping (StreamDeckCommand) -> PlaybackResult, failed: @escaping (String) -> Void) {
+    func start(handle: @escaping (StreamDeckCommand) -> StreamDeckResponse, failed: @escaping (String) -> Void) {
         let parameters = NWParameters.tcp
         let host = NWEndpoint.Host(StreamDeckCommand.host)
         let port = StreamDeckCommand.port
@@ -104,7 +138,7 @@ final class StreamDeckControl {
     }
 
     private func readRequest(_ connection: NWConnection, bytes: Data,
-                             handle: @escaping (StreamDeckCommand) -> PlaybackResult) {
+                             handle: @escaping (StreamDeckCommand) -> StreamDeckResponse) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: maxHeaderBytes - bytes.count) {
             [weak self] data, _, complete, error in
             guard let self, error == nil else {
@@ -115,7 +149,7 @@ final class StreamDeckControl {
             if let end = received.range(of: self.headerEnd)?.lowerBound {
                 self.handleRequest(connection, header: received.prefix(upTo: end), handle: handle)
             } else if complete || received.count >= self.maxHeaderBytes {
-                self.reply(connection, status: "400 Bad Request", body: "invalid request")
+                self.reply(connection, with: .init(status: "400 Bad Request", text: "invalid request"))
             } else {
                 self.readRequest(connection, bytes: received, handle: handle)
             }
@@ -123,29 +157,28 @@ final class StreamDeckControl {
     }
 
     private func handleRequest(_ connection: NWConnection, header: Data,
-                               handle: (StreamDeckCommand) -> PlaybackResult) {
+                               handle: (StreamDeckCommand) -> StreamDeckResponse) {
         let lines = String(decoding: header, as: UTF8.self).components(separatedBy: "\r\n")
         let authority = "host: \(StreamDeckCommand.host):\(StreamDeckCommand.port)"
         guard let request = lines.first,
               lines.dropFirst().contains(where: { $0.lowercased() == authority }),
               !lines.dropFirst().contains(where: { $0.lowercased().hasPrefix("sec-fetch-site:") }) else {
-            reply(connection, status: "400 Bad Request", body: "local control only")
+            reply(connection, with: .init(status: "400 Bad Request", text: "local control only"))
             return
         }
         let parts = request.split(separator: " ", omittingEmptySubsequences: false)
         guard parts.count == 3, parts[0] == "GET", parts[2] == "HTTP/1.1",
               let command = StreamDeckCommand(target: String(parts[1])) else {
-            reply(connection, status: "404 Not Found", body: "unknown command")
+            reply(connection, with: .init(status: "404 Not Found", text: "unknown command"))
             return
         }
-        let result = handle(command).response
-        reply(connection, status: result.status, body: result.body)
+        reply(connection, with: handle(command))
     }
 
-    private func reply(_ connection: NWConnection, status: String, body: String) {
-        let message = "HTTP/1.1 \(status)\r\nContent-Type: text/plain; charset=utf-8\r\n"
-            + "Content-Length: \(body.utf8.count)\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n\(body)"
-        connection.send(content: Data(message.utf8), completion: .contentProcessed { _ in
+    private func reply(_ connection: NWConnection, with response: StreamDeckResponse) {
+        let header = "HTTP/1.1 \(response.status)\r\nContent-Type: \(response.contentType)\r\n"
+            + "Content-Length: \(response.body.count)\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n"
+        connection.send(content: Data(header.utf8) + response.body, completion: .contentProcessed { _ in
             connection.cancel()
         })
     }

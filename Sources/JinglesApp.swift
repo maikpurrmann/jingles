@@ -12,6 +12,18 @@ struct JinglesApp: App {
         }
         .defaultSize(width: 620, height: 470)
         .windowResizability(.contentMinSize)
+        .commands {
+            CommandMenu("Stream Deck") {
+                Button("Link für ausgewählten Jingle kopieren") {
+                    if let filename = player.selectedFilename {
+                        player.copyStreamDeckLink(for: filename)
+                    }
+                }
+                .disabled(!player.files.contains { $0.lastPathComponent == player.selectedFilename })
+
+                Button("Fade-Link kopieren", action: player.copyFadeLink)
+            }
+        }
     }
 }
 
@@ -214,13 +226,6 @@ private struct JinglesView: View {
             Stepper(value: $player.fadeUpSeconds, in: 0...30, step: 0.1) {
                 LabeledContent("Zeit zum Anheben", value: fadeTimeLabel(player.fadeUpSeconds))
             }
-            Button {
-                player.copyFadeLink()
-                popovers.showsFadeSettings = false
-            } label: {
-                Label("Stream-Deck-Link kopieren", systemImage: "link")
-                    .labelStyle(.titleAndIcon)
-            }
         }
         .controlSize(.regular)
         .padding(16)
@@ -270,15 +275,6 @@ private struct JinglesView: View {
                 .frame(minWidth: 42, alignment: .trailing)
                 .accessibilityLabel(isPlaying ? "Läuft, Restzeit" : remaining == nil ? "Dauer" : "Restzeit")
                 .accessibilityValue(timeLabel(remaining ?? player.durations[file]))
-            Button {
-                player.copyStreamDeckLink(for: name)
-            } label: {
-                Label("Link kopieren", systemImage: "link")
-                    .labelStyle(.iconOnly)
-                    .frame(width: 24, height: 24)
-            }
-            .help("Stream-Deck-Link für „\(name)“ kopieren")
-            .accessibilityLabel("Stream-Deck-Link für „\(name)“ kopieren")
         }
         .buttonStyle(.borderless)
         .padding(.vertical, 3)
@@ -307,16 +303,20 @@ private struct JinglesInfoView: View {
             .font(.callout)
             Divider()
             VStack(alignment: .leading, spacing: 4) {
+                Text("Stream Deck").font(.headline)
+                Text("Installiere das Jingles-Plugin und lege Jingle, Fade oder Restzeit auf eine Taste. Bei Jingle wählst du anschließend die Datei. Die Tasten zeigen den Zustand der geöffneten App an.")
+                Link("Plugin und Anleitung",
+                     destination: URL(string: "https://github.com/maikpurrmann/jingles#stream-deck")!)
+                Text("Die bisherigen Steuerlinks findest du im Menü „Stream Deck“.")
+                    .foregroundStyle(.secondary)
+            }
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Einspieler").font(.headline)
                 Text("Wähle einen Ordner mit WAV- oder MP3-Dateien. Ein Klick auf die Zeile wählt den Jingle vor. Das Play-Symbol in der Zeile startet ihn von vorn.")
             }
             VStack(alignment: .leading, spacing: 4) {
                 Text("Wiedergabe und Fade").font(.headline)
                 Text("Pause hält die Position, Stopp setzt sie zurück. Der Prozentknopf senkt alle Jingles gemeinsam ab und hebt sie beim nächsten Klick wieder an. Zielpegel und Zeiten stehen in den Fade-Einstellungen.")
-            }
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Stream Deck").font(.headline)
-                Text("Kopiere den Link neben dem Jingle oder in den Fade-Einstellungen. Hinterlege ihn als Webseite mit GET-Anfrage im Hintergrund. Jingles muss dafür geöffnet sein.")
             }
         }
         .font(.callout)

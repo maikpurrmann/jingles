@@ -4,7 +4,7 @@ Jingles ist ein macOS-Soundboard für Podcasts und Live-Aufnahmen. Spiele WAV- u
 
 ## Download und Installation
 
-**[Jingles 0.4.0 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.4.0/Jingles-0.4.0-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.4.0)
+**[Jingles 0.5.0 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.5.0/Jingles-0.5.0-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.5.0)
 
 <img src="docs/jingles-wiedergabe.png" alt="Jingles während der Wiedergabe: Das laufende Outro ist mit einer türkisen Wellenform markiert. Restzeit, Wiedergabetasten und Fade stehen unten." width="500">
 
@@ -29,7 +29,7 @@ Jingles spielt jeweils eine Datei. Eigene Einspieler bleiben in deinem Soundboar
 
 ### Plugin mit Statusanzeige
 
-Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade die Datei `.streamDeckPlugin` aus demselben [GitHub-Release](https://github.com/maikpurrmann/jingles/releases) wie die App. Öffne die heruntergeladene Datei per Doppelklick.
+Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-Plugin für Stream Deck](https://github.com/maikpurrmann/jingles/releases/download/v0.5.0/Jingles.streamDeckPlugin) und öffne die Datei per Doppelklick.
 
 1. Jingles öffnen und den Einspielerordner wählen.
 2. Im Stream Deck die Aktion **Jingles → Jingle** auf einen Tastenplatz ziehen. In den Einstellungen der Taste unter **Einspieler** die gewünschte Datei wählen. Für weitere Einspieler kannst du jeweils eine weitere Taste belegen.

@@ -4,16 +4,18 @@ const reload = document.getElementById("reload");
 const status = document.getElementById("status");
 
 window.connectElgatoStreamDeckSocket = (port, uuid, registrationEvent, _info, actionInfo) => {
-    const { action, context, payload } = JSON.parse(actionInfo);
+    const { action, payload } = JSON.parse(actionInfo);
     const isJingle = action === "de.maikpurrmann.jingles.jingle";
     const settings = { ...payload.settings };
     let latestRequest;
+    let requestTimeout;
     const socket = new WebSocket(`ws://127.0.0.1:${port}`);
 
     document.getElementById("jingle").hidden = !isJingle;
     app.value = settings.preview ? "preview" : "release";
 
-    const send = (event, payload) => socket.send(JSON.stringify({ event, action, context, payload }));
+    // Stream Deck maps the registered inspector UUID to the selected action.
+    const send = (event, payload) => socket.send(JSON.stringify({ event, action, context: uuid, payload }));
 
     function showFilenames(filenames) {
         filename.replaceChildren(new Option("Einspieler auswählen", ""));
@@ -32,6 +34,10 @@ window.connectElgatoStreamDeckSocket = (port, uuid, registrationEvent, _info, ac
         if (!isJingle) return;
         latestRequest = crypto.randomUUID();
         status.textContent = "Lade Einspieler …";
+        clearTimeout(requestTimeout);
+        requestTimeout = setTimeout(() => {
+            status.textContent = "Keine Antwort vom Stream-Deck-Plugin. Lade die Liste erneut.";
+        }, 2000);
         send("sendToPlugin", { requestId: latestRequest, preview: settings.preview === true });
     }
 
@@ -47,6 +53,7 @@ window.connectElgatoStreamDeckSocket = (port, uuid, registrationEvent, _info, ac
     socket.onmessage = ({ data }) => {
         const message = JSON.parse(data);
         if (message.event !== "sendToPropertyInspector" || message.payload.requestId !== latestRequest) return;
+        clearTimeout(requestTimeout);
         const { filenames } = message.payload;
         showFilenames(filenames);
         status.textContent = filenames === null

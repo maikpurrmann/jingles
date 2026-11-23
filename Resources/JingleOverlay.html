@@ -6,20 +6,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; color: #fff; font: 600 21px system-ui, sans-serif; }
+  body {
+    --unit: calc(100vw / 240);
+    margin: 0;
+    color: #fff;
+    font: 600 calc(27 * var(--unit))/1 system-ui, sans-serif;
+  }
   #overlay {
-    display: flex; align-items: center; gap: 12px;
-    width: max-content; max-width: 100%; min-height: 52px;
-    border-radius: 12px; padding: 7px 14px;
+    display: flex;
+    align-items: center;
+    gap: calc(12 * var(--unit));
+    width: max-content;
+    max-width: 100%;
+    min-height: calc(52 * var(--unit));
+    border-radius: calc(12 * var(--unit));
+    padding: calc(7 * var(--unit)) calc(14 * var(--unit));
     background: rgba(14, 21, 21, .92);
   }
   #overlay[hidden] { display: none; }
-  #overlay::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #38d58d; }
-  #time { font-variant-numeric: tabular-nums; font-size: 27px; line-height: 1; }
+  #overlay::before {
+    content: "";
+    width: calc(9 * var(--unit));
+    height: calc(9 * var(--unit));
+    border-radius: 50%;
+    background: #38d58d;
+  }
+  #time { font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
-<div id="overlay" hidden>Jingle <span id="time"></span></div>
+<div id="overlay" hidden><span id="time"></span></div>
 <script>
   const overlay = document.getElementById("overlay");
   const time = document.getElementById("time");

@@ -73,7 +73,7 @@ Der Fade wirkt auf den Ton der App. Das Mikrofon bleibt separat. [OBS-Anleitung 
 
 ### Jingle-Restzeit an Gesprächspartner senden
 
-Ab Jingles 0.5.3 liefert `http://127.0.0.1:17639/obs/jingle` eine transparente Restzeitanzeige für eine OBS-Browserquelle. Wähle dafür **240 × 64 Pixel**. Die Anzeige erscheint beim Abspielen und verschwindet bei Pause, Stopp oder am Ende.
+Ab Jingles 0.5.3 liefert `http://127.0.0.1:17639/obs/jingle` eine transparente Restzeitanzeige für eine OBS-Browserquelle. Für eine große Anzeige auf einer Full-HD-Leinwand verwende zum Beispiel **768 × 205 Pixel** bei einer OBS-Skalierung von **1,00**. Für eine kleine Anzeige kannst du **240 × 64 Pixel** verwenden. Die Anzeige aus Statuspunkt und Restzeit erscheint beim Abspielen und verschwindet bei Pause, Stopp oder am Ende.
 
 Wenn der Countdown nur im Gesprächsbild sichtbar sein soll, lege in OBS eine Szene **Ninja** an und binde die Aufnahmeszene als Szenenquelle ein. Füge darüber die Browserquelle hinzu. Wähle in den Einstellungen der virtuellen Kamera **Szene → Ninja**. Die OBS-Aufnahme verwendet die normale Programmszene. VDO.Ninja verwendet **OBS Virtual Camera** als Kamera. [OBS zur virtuellen Kamera](https://obsproject.com/kb/virtual-camera-guide)
 

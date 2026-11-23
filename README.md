@@ -4,7 +4,7 @@ Jingles ist ein macOS-Soundboard für Podcasts und Live-Aufnahmen. Spiele WAV- u
 
 ## Download und Installation
 
-**[Jingles 0.5.0 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.5.0/Jingles-0.5.0-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.5.0)
+**[Jingles 0.5.1 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.5.1/Jingles-0.5.1-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.5.1)
 
 <img src="docs/jingles-wiedergabe.png" alt="Jingles während der Wiedergabe: Das laufende Outro ist mit einer türkisen Wellenform markiert. Restzeit, Wiedergabetasten und Fade stehen unten." width="500">
 
@@ -31,7 +31,7 @@ Jingles lässt sich direkt im App-Fenster bedienen. Für Aufnahmen mit dem Strea
 
 ### Plugin einrichten
 
-Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-Plugin für Stream Deck](https://github.com/maikpurrmann/jingles/releases/download/v0.5.0/Jingles.streamDeckPlugin) und öffne die Datei per Doppelklick.
+Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-Plugin für Stream Deck](https://github.com/maikpurrmann/jingles/releases/download/v0.5.1/Jingles.streamDeckPlugin) und öffne die Datei per Doppelklick.
 
 1. Jingles öffnen und den Einspielerordner wählen.
 2. Im Stream Deck die Aktion **Jingles → Jingle** auf einen Tastenplatz ziehen. In den Einstellungen der Taste unter **Einspieler** die gewünschte Datei wählen. Für weitere Einspieler kannst du jeweils eine weitere Taste belegen.
@@ -47,13 +47,13 @@ Wenn in der Dateiauswahl ein neuer Einspieler fehlt, aktualisiere den Ordner in 
 
 ### Vorhandene Tasten mit Steuerlinks
 
-Die bisherigen Tasten mit lokalen HTTP-GET-Anfragen funktionieren auch mit Jingles 0.5.0. Sie lösen Wiedergabe, Play/Pause oder Fade aus. Für die Statusanzeige belegst du die gewünschten Tasten mit den Plugin-Aktionen.
+Die bisherigen Tasten mit lokalen HTTP-GET-Anfragen funktionieren weiterhin. Sie lösen Wiedergabe, Play/Pause oder Fade aus. Für die Statusanzeige belegst du die gewünschten Tasten mit den Plugin-Aktionen.
 
-1. In Jingles das **Link-Symbol** in der Zeile des gewünschten Einspielers anklicken.
+1. In Jingles den gewünschten Einspieler auswählen und in der Menüleiste **Stream Deck → Link für ausgewählten Jingle kopieren** wählen.
 2. Im Stream Deck eine Aktion **System → Webseite** anlegen, den Link einfügen und **GET-Anfrage im Hintergrund** wählen.
 3. Jingles geöffnet lassen. Ein Tastendruck startet die Datei, ein weiterer Druck stoppt sie. Eine andere Taste wechselt direkt zum nächsten Einspieler.
 
-In den Fade-Einstellungen kannst du den Link für den gemeinsamen Fade kopieren. Eine weitere Taste lässt sich mit dem Link für Play/Pause belegen.
+Im selben Menü findest du **Fade-Link kopieren**. Eine weitere Taste lässt sich mit dem Link für Play/Pause belegen.
 
 | Aktion | Lokaler Link |
 | --- | --- |

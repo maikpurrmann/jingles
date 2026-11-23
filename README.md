@@ -4,7 +4,7 @@ Jingles ist ein macOS-Soundboard für Podcasts und Live-Aufnahmen. Spiele WAV- u
 
 ## Download und Installation
 
-**[Jingles 0.4.0 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.4.0/Jingles-0.4.0-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.4.0)
+**[Jingles 0.5.0 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.5.0/Jingles-0.5.0-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.5.0)
 
 <img src="docs/jingles-wiedergabe.png" alt="Jingles während der Wiedergabe: Das laufende Outro ist mit einer türkisen Wellenform markiert. Restzeit, Wiedergabetasten und Fade stehen unten." width="500">
 
@@ -26,6 +26,24 @@ Der Download ist lokal signiert und bislang ohne Apple-Notarisierung. Wenn macOS
 Jingles spielt jeweils eine Datei. Eigene Einspieler bleiben in deinem Soundboard-Ordner. Unterordner werden beim Einlesen übersprungen.
 
 ## Stream Deck
+
+### Plugin mit Statusanzeige
+
+Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-Plugin für Stream Deck](https://github.com/maikpurrmann/jingles/releases/download/v0.5.0/Jingles.streamDeckPlugin) und öffne die Datei per Doppelklick.
+
+1. Jingles öffnen und den Einspielerordner wählen.
+2. Im Stream Deck die Aktion **Jingles → Jingle** auf einen Tastenplatz ziehen. In den Einstellungen der Taste unter **Einspieler** die gewünschte Datei wählen. Für weitere Einspieler kannst du jeweils eine weitere Taste belegen.
+3. Die Aktion **Jingles → Fade** auf einen Tastenplatz ziehen. Optional **Jingles → Restzeit** auf eine weitere Taste legen. Sie zeigt die Restzeit des laufenden Einspielers und steht ohne Wiedergabe auf `0:00`. Lass ihr Titelfeld frei, damit der Countdown angezeigt wird.
+
+Unter **App** ist bei allen drei Aktionen **Jingles** voreingestellt. Für einen Test mit dem separaten Vorschau-Build wählst du **Jingles Vorschau**.
+
+Die Taste ist standardmäßig mit **Jingle** beschriftet. Gib im Stream-Deck-Feld **Titel** deinen eigenen Namen ein. Der Titel bleibt beim Starten und Stoppen erhalten. Der grüne Rand zeigt an, welcher Jingle gerade spielt. Er läuft im Uhrzeigersinn ab und zeigt so den Wiedergabefortschritt. Ein weiterer Druck stoppt den Jingle.
+
+Die schwarze **Fade**-Taste bekommt bei aktiver Pegelabsenkung einen orangefarbenen Rand. Beide Tasten zeigen auch Änderungen aus dem App-Fenster an. Falls du eigene Tastenbilder gesetzt hast, setze sie auf die Plugin-Bilder zurück, damit die Ränder erscheinen.
+
+Wenn in der Dateiauswahl ein neuer Einspieler fehlt, aktualisiere den Ordner in Jingles und klicke in den Tasteneinstellungen auf **Neu laden**.
+
+### Steuerung über Links
 
 1. In Jingles das **Link-Symbol** in der Zeile des gewünschten Einspielers anklicken.
 2. Im Stream Deck eine Aktion **System → Webseite** anlegen, den Link einfügen und **GET-Anfrage im Hintergrund** wählen.
@@ -68,3 +86,13 @@ open "build/Jingles Vorschau.app"
 ```
 
 Die Vorschau hat eigene Einstellungen und Port `17640`. Die normale App verwendet die Bundle-ID `de.maikpurrmann.jingles` und Port `17639`.
+
+Das Plugin baust und paketierst du mit Node.js 24:
+
+```sh
+cd stream-deck
+npm ci
+npm run package
+```
+
+Der Installer liegt danach unter `build/de.maikpurrmann.jingles.streamDeckPlugin` im Repository.

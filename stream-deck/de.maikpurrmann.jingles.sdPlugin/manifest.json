@@ -1,0 +1,95 @@
+{
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+  "UUID": "de.maikpurrmann.jingles",
+  "Name": "Jingles",
+  "Author": "Maik Purrmann",
+  "Description": "Jingles und Pegelabsenkung steuern. Wiedergabe und Restzeit anzeigen.",
+  "Version": "0.5.0.7",
+  "Icon": "images/plugin",
+  "Category": "Jingles",
+  "CategoryIcon": "images/waveform",
+  "URL": "https://github.com/maikpurrmann/jingles",
+  "CodePath": "bin/plugin.mjs",
+  "PropertyInspectorPath": "inspector/index.html",
+  "SDKVersion": 2,
+  "Nodejs": {
+    "Version": "24"
+  },
+  "Software": {
+    "MinimumVersion": "7.1"
+  },
+  "OS": [
+    {
+      "Platform": "mac",
+      "MinimumVersion": "13"
+    }
+  ],
+  "Actions": [
+    {
+      "UUID": "de.maikpurrmann.jingles.jingle",
+      "Name": "Jingle",
+      "Icon": "images/action",
+      "Tooltip": "Einen Einspieler starten oder stoppen.",
+      "Controllers": [
+        "Keypad"
+      ],
+      "SupportedInMultiActions": false,
+      "States": [
+        {
+          "Image": "images/jingle-off",
+          "Title": "Jingle",
+          "TitleAlignment": "middle",
+          "FontSize": 14
+        }
+      ]
+    },
+    {
+      "UUID": "de.maikpurrmann.jingles.fade",
+      "Name": "Fade",
+      "Icon": "images/fade-action",
+      "Tooltip": "Die Pegelabsenkung ein- oder ausschalten.",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "SupportedInMultiActions": false,
+      "States": [
+        {
+          "Image": "images/fade-off",
+          "Name": "Normal",
+          "Title": "Fade",
+          "TitleAlignment": "middle",
+          "FontStyle": "Bold",
+          "FontSize": 14
+        },
+        {
+          "Image": "images/fade-on",
+          "Name": "Abgesenkt",
+          "Title": "Fade",
+          "TitleAlignment": "middle",
+          "FontStyle": "Bold",
+          "FontSize": 14
+        }
+      ]
+    },
+    {
+      "UUID": "de.maikpurrmann.jingles.countdown",
+      "Name": "Restzeit",
+      "Icon": "images/countdown-action",
+      "Tooltip": "Die verbleibende Zeit des laufenden Einspielers anzeigen.",
+      "Controllers": [
+        "Keypad"
+      ],
+      "SupportedInMultiActions": false,
+      "States": [
+        {
+          "Image": "images/jingle-off",
+          "Title": "0:00",
+          "TitleAlignment": "middle",
+          "FontStyle": "Bold",
+          "FontSize": 18
+        }
+      ]
+    }
+  ]
+}

@@ -1,2 +1,4 @@
 /build/
 .DS_Store
+/stream-deck/node_modules/
+/stream-deck/*.sdPlugin/bin/

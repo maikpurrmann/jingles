@@ -77,12 +77,8 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         }
         refresh()
         remote.start(handle: { [weak self] command in
-            guard let self else { return .unavailable }
-            switch command {
-            case .toggle: return self.toggle()
-            case .play(let name): return self.toggle(named: name)
-            case .fade: return self.toggleFade()
-            }
+            guard let self else { return .init(status: "503 Service Unavailable", text: "playback unavailable") }
+            return self.handleStreamDeckCommand(command)
         }, failed: { [weak self] message in
             self?.remoteError = message
         })
@@ -222,6 +218,32 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
             playbackError = "Die Datei „\(name)“ konnte nicht geöffnet werden."
             return .unavailable
         }
+    }
+
+    private func handleStreamDeckCommand(_ command: StreamDeckCommand) -> StreamDeckResponse {
+        let result: PlaybackResult
+        switch command {
+        case .status:
+            let playingFilename = state == .playing ? currentFilename : nil
+            let playingRemainingSeconds = state == .playing ? remainingSeconds : nil
+            let progress = state == .playing ? playbackProgress : nil
+            return .init(json: [
+                "playingFilename": playingFilename.map { $0 as Any } ?? NSNull(),
+                "isLowered": isLowered,
+                "remainingSeconds": playingRemainingSeconds.map { $0 as Any } ?? NSNull(),
+                "playbackProgress": progress.map { $0 as Any } ?? NSNull()
+            ])
+        case .jingles:
+            return .init(json: ["filenames": files.map(\.lastPathComponent)])
+        case .toggle:
+            result = toggle()
+        case .play(let name):
+            result = toggle(named: name)
+        case .fade:
+            result = toggleFade()
+        }
+        let response = result.response
+        return .init(status: response.status, text: response.body)
     }
 
     func copyStreamDeckLink(for name: String) {

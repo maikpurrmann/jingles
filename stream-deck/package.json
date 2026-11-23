@@ -1,0 +1,23 @@
+{
+  "name": "jingles-stream-deck",
+  "version": "0.5.0",
+  "private": true,
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "esbuild src/plugin.ts --bundle --platform=node --target=node24 --format=esm --banner:js=\"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);\" --outfile=de.maikpurrmann.jingles.sdPlugin/bin/plugin.mjs",
+    "package": "npm run check && npm run build && streamdeck pack de.maikpurrmann.jingles.sdPlugin --output ../build --force"
+  },
+  "type": "module",
+  "dependencies": {
+    "@elgato/streamdeck": "3.0.6"
+  },
+  "devDependencies": {
+    "@elgato/cli": "1.10.5",
+    "@types/node": "24.19.2",
+    "esbuild": "0.28.2",
+    "typescript": "5.9.3"
+  },
+  "overrides": {
+    "zod": "4.6.7"
+  }
+}

@@ -23,10 +23,10 @@ struct StreamDeckResponse {
     let body: Data
     let contentType: String
 
-    init(status: String, text: String) {
+    init(status: String, text: String, contentType: String = "text/plain; charset=utf-8") {
         self.status = status
         body = Data(text.utf8)
-        contentType = "text/plain; charset=utf-8"
+        self.contentType = contentType
     }
 
     init(json: [String: Any]) {
@@ -42,6 +42,7 @@ struct StreamDeckResponse {
 
 enum StreamDeckCommand {
     case status
+    case overlayStatus
     case jingles
     case toggle
     case play(String)
@@ -86,7 +87,7 @@ enum StreamDeckCommand {
     var link: String? {
         let root = "http://\(Self.host):\(Self.port)"
         switch self {
-        case .status, .jingles:
+        case .status, .overlayStatus, .jingles:
             return nil
         case .toggle:
             return root + "/toggle"
@@ -160,19 +161,47 @@ final class StreamDeckControl {
                                handle: (StreamDeckCommand) -> StreamDeckResponse) {
         let lines = String(decoding: header, as: UTF8.self).components(separatedBy: "\r\n")
         let authority = "host: \(StreamDeckCommand.host):\(StreamDeckCommand.port)"
-        guard let request = lines.first,
-              lines.dropFirst().contains(where: { $0.lowercased() == authority }),
-              !lines.dropFirst().contains(where: { $0.lowercased().hasPrefix("sec-fetch-site:") }) else {
+        let headers = lines.dropFirst().map { $0.lowercased() }
+        guard let request = lines.first, headers.contains(authority) else {
             reply(connection, with: .init(status: "400 Bad Request", text: "local control only"))
             return
         }
         let parts = request.split(separator: " ", omittingEmptySubsequences: false)
-        guard parts.count == 3, parts[0] == "GET", parts[2] == "HTTP/1.1",
-              let command = StreamDeckCommand(target: String(parts[1])) else {
+        guard parts.count == 3, parts[0] == "GET", parts[2] == "HTTP/1.1" else {
+            reply(connection, with: .init(status: "404 Not Found", text: "unknown command"))
+            return
+        }
+        let target = String(parts[1])
+        let fetchSiteHeaders = headers.filter { $0.hasPrefix("sec-fetch-site:") }
+        if target == "/obs/jingle" || target == "/obs/jingle/status" {
+            guard fetchSiteHeaders.allSatisfy({ $0 == "sec-fetch-site: same-origin" || $0 == "sec-fetch-site: none" }) else {
+                reply(connection, with: .init(status: "400 Bad Request", text: "local overlay only"))
+                return
+            }
+            if target == "/obs/jingle" {
+                reply(connection, with: overlayPage)
+            } else {
+                reply(connection, with: handle(.overlayStatus))
+            }
+            return
+        }
+        guard fetchSiteHeaders.isEmpty else {
+            reply(connection, with: .init(status: "400 Bad Request", text: "local control only"))
+            return
+        }
+        guard let command = StreamDeckCommand(target: target) else {
             reply(connection, with: .init(status: "404 Not Found", text: "unknown command"))
             return
         }
         reply(connection, with: handle(command))
+    }
+
+    private var overlayPage: StreamDeckResponse {
+        guard let url = Bundle.main.url(forResource: "JingleOverlay", withExtension: "html"),
+              let html = try? String(contentsOf: url, encoding: .utf8) else {
+            return .init(status: "404 Not Found", text: "overlay unavailable")
+        }
+        return .init(status: "200 OK", text: html, contentType: "text/html; charset=utf-8")
     }
 
     private func reply(_ connection: NWConnection, with response: StreamDeckResponse) {

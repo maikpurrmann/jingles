@@ -20,6 +20,7 @@ app="$staging/$app_name.app"
 iconset="$staging/AppIcon.iconset"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$iconset"
 cp Info.plist "$app/Contents/Info.plist"
+cp Resources/JingleOverlay.html "$app/Contents/Resources/"
 /usr/libexec/PlistBuddy -c "Add :JinglesBuildDate string $(TZ=Europe/Berlin /bin/date +%d.%m.%Y)" \
     "$app/Contents/Info.plist"
 if [[ $mode == --preview ]]; then

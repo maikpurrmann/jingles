@@ -233,6 +233,9 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
                 "remainingSeconds": playingRemainingSeconds.map { $0 as Any } ?? NSNull(),
                 "playbackProgress": progress.map { $0 as Any } ?? NSNull()
             ])
+        case .overlayStatus:
+            let seconds = state == .playing ? remainingSeconds : nil
+            return .init(json: ["remainingSeconds": seconds.map { $0 as Any } ?? NSNull()])
         case .jingles:
             return .init(json: ["filenames": files.map(\.lastPathComponent)])
         case .toggle:

@@ -4,7 +4,7 @@ Jingles ist ein macOS-Soundboard für Podcasts und Live-Aufnahmen. Spiele WAV- u
 
 ## Download und Installation
 
-**[Jingles 0.5.2 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.5.2/Jingles-0.5.2-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.5.2)
+**[Jingles 0.5.3 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.5.3/Jingles-0.5.3-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.5.3)
 
 <img src="docs/jingles-wiedergabe.png" alt="Jingles während der Wiedergabe: Das laufende Outro ist mit einer türkisen Wellenform markiert. Restzeit, Wiedergabetasten und Fade stehen unten." width="500">
 
@@ -31,7 +31,7 @@ Jingles lässt sich direkt im App-Fenster bedienen. Für Aufnahmen mit dem Strea
 
 ### Plugin einrichten
 
-Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-Plugin für Stream Deck](https://github.com/maikpurrmann/jingles/releases/download/v0.5.2/Jingles.streamDeckPlugin) und öffne die Datei per Doppelklick.
+Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-Plugin für Stream Deck](https://github.com/maikpurrmann/jingles/releases/download/v0.5.3/Jingles.streamDeckPlugin) und öffne die Datei per Doppelklick.
 
 1. Jingles öffnen und den Einspielerordner wählen.
 2. Im Stream Deck die Aktion **Jingles → Jingle** auf einen Tastenplatz ziehen. In den Einstellungen der Taste unter **Einspieler** die gewünschte Datei wählen. Für weitere Einspieler kannst du jeweils eine weitere Taste belegen.
@@ -70,6 +70,14 @@ Die App erledigt beim Kopieren die URL-Kodierung des Dateinamens. Die Links gelt
 3. Eine kurze Probe aufnehmen. Prüfe im OBS-Mixer, ob der Jingles-Kanal ausschlägt, und kontrolliere die Spur in der Aufnahmedatei. Falls OBS nach einem Update keinen Pegel zeigt, prüfe die Anwendungsauswahl und starte OBS bei geöffneter Jingles-App neu.
 
 Der Fade wirkt auf den Ton der App. Das Mikrofon bleibt separat. [OBS-Anleitung zur Mehrspuraufnahme](https://obsproject.com/kb/multiple-audio-track-recording-guide)
+
+### Jingle-Restzeit an Gesprächspartner senden
+
+Ab Jingles 0.5.3 liefert `http://127.0.0.1:17639/obs/jingle` eine transparente Restzeitanzeige für eine OBS-Browserquelle. Für eine große Anzeige auf einer Full-HD-Leinwand verwende zum Beispiel **768 × 205 Pixel** bei einer OBS-Skalierung von **1,00**. Für eine kleine Anzeige kannst du **240 × 64 Pixel** verwenden. Die Anzeige aus Statuspunkt und Restzeit erscheint beim Abspielen und verschwindet bei Pause, Stopp oder am Ende.
+
+Wenn der Countdown nur im Gesprächsbild sichtbar sein soll, lege in OBS eine Szene **Ninja** an und binde die Aufnahmeszene als Szenenquelle ein. Füge darüber die Browserquelle hinzu. Wähle in den Einstellungen der virtuellen Kamera **Szene → Ninja**. Die OBS-Aufnahme verwendet die normale Programmszene. VDO.Ninja verwendet **OBS Virtual Camera** als Kamera. [OBS zur virtuellen Kamera](https://obsproject.com/kb/virtual-camera-guide)
+
+Für die **Aufnahmezeit** lade das [OBS-Paket](https://github.com/maikpurrmann/jingles/releases/download/v0.5.3/Jingles-OBS-Aufnahmezeit.zip) und entpacke `RecordingTimer.lua` und `RecordingTimer.html` gemeinsam in einem beschreibbaren Ordner. Lade die Lua-Datei über **Werkzeuge → Skripte**. Füge die HTML-Datei als lokale Browserquelle in **Ninja** hinzu. Verwende für beide Einblendungen dieselben Quellabmessungen und richte die Aufnahmezeit am rechten Bildrand aus. Die Uhr läuft direkt in OBS.
 
 ## Aus dem Quellcode bauen
 

@@ -225,9 +225,11 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         switch command {
         case .status:
             let playingFilename = state == .playing ? currentFilename : nil
+            let playingRemainingSeconds = state == .playing ? remainingSeconds : nil
             return .init(json: [
                 "playingFilename": playingFilename.map { $0 as Any } ?? NSNull(),
-                "isLowered": isLowered
+                "isLowered": isLowered,
+                "remainingSeconds": playingRemainingSeconds.map { $0 as Any } ?? NSNull()
             ])
         case .jingles:
             return .init(json: ["filenames": files.map(\.lastPathComponent)])

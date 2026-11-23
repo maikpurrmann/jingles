@@ -33,9 +33,11 @@ Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade die Datei `.st
 
 1. Jingles öffnen und den Einspielerordner wählen.
 2. Im Stream Deck die Aktion **Jingles → Jingle** auf einen Tastenplatz ziehen. In den Einstellungen der Taste unter **Einspieler** die gewünschte Datei wählen. Für weitere Einspieler kannst du jeweils eine weitere Taste belegen.
-3. Die Aktion **Jingles → Fade** auf einen Tastenplatz ziehen. Bei beiden Aktionen ist unter **App** standardmäßig **Jingles** eingestellt. Für einen Test mit dem separaten Vorschau-Build wählst du hier **Jingles Vorschau**.
+3. Die Aktion **Jingles → Fade** auf einen Tastenplatz ziehen. Optional **Jingles → Restzeit** auf eine weitere Taste legen. Sie zeigt die verbleibende Zeit des laufenden Einspielers und ist ohne Wiedergabe leer. Lass ihr Titelfeld frei, damit der Countdown angezeigt wird.
 
-Die Jingle-Taste ist hervorgehoben, solange ihre Datei spielt. Ein weiterer Druck stoppt sie. Die Fade-Taste zeigt die aktive Pegelabsenkung auch zwischen zwei Einspielern. Beide Anzeigen folgen auch Änderungen im App-Fenster.
+Unter **App** ist bei allen drei Aktionen **Jingles** voreingestellt. Für einen Test mit dem separaten Vorschau-Build wählst du **Jingles Vorschau**.
+
+Die Jingle-Taste hat während der Wiedergabe einen grünen Rand. Den Namen kannst du im Feld **Titel** eintragen und für beide Zustände verknüpfen. Wenn du zuvor eigene Bilder für die Taste gesetzt hast, setze sie für beide Zustände auf die Plugin-Bilder zurück, um den grünen Rand zu sehen. Ein weiterer Druck stoppt sie. Die Fade-Taste zeigt die aktive Pegelabsenkung auch zwischen zwei Einspielern. Beide Anzeigen folgen auch Änderungen im App-Fenster.
 
 Wenn in der Dateiauswahl ein neuer Einspieler fehlt, aktualisiere den Ordner in Jingles und klicke in den Tasteneinstellungen auf **Neu laden**.
 

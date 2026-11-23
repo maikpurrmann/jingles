@@ -4,13 +4,13 @@ import streamDeck, {
 } from "@elgato/streamdeck";
 
 type Settings = { filename?: string; preview?: boolean };
-type Status = { playingFilename: string | null; isLowered: boolean };
-type Kind = "jingle" | "fade";
+type Status = { playingFilename: string | null; isLowered: boolean; remainingSeconds?: number | null };
+type Kind = "jingle" | "fade" | "countdown";
 type VisibleKey = {
     key: KeyAction<Settings>;
     kind: Kind;
     settings: Settings;
-    state?: 0 | 1;
+    display?: 0 | 1 | string;
 };
 
 const ports = [17639, 17640] as const;
@@ -40,6 +40,14 @@ function schedulePoll(delay: number): void {
     }, delay);
 }
 
+function countdownTitle(status?: Status): string {
+    const seconds = status?.remainingSeconds;
+    if (!status?.playingFilename || typeof seconds !== "number" || !Number.isSafeInteger(seconds) || seconds < 0) {
+        return "";
+    }
+    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
 async function poll(): Promise<void> {
     polling = true;
     try {
@@ -54,13 +62,21 @@ async function poll(): Promise<void> {
             }
             for (const entry of visibleKeys.values()) {
                 if (portFor(entry.settings) !== port) continue;
+                if (entry.kind === "countdown") {
+                    const title = countdownTitle(status);
+                    if (entry.display !== title) {
+                        await entry.key.setTitle(title);
+                        entry.display = title;
+                    }
+                    continue;
+                }
                 const active = entry.kind === "fade"
                     ? status?.isLowered === true
                     : typeof status?.playingFilename === "string" && status.playingFilename === entry.settings.filename;
                 const state = active ? 1 : 0;
-                if (entry.state !== state) {
+                if (entry.display !== state) {
                     await entry.key.setState(state);
-                    entry.state = state;
+                    entry.display = state;
                 }
             }
         }));
@@ -96,6 +112,7 @@ abstract class JinglesAction extends SingletonAction<Settings> {
     }
 
     override async onKeyDown({ action: key, payload }: KeyDownEvent<Settings>): Promise<void> {
+        if (this.kind === "countdown") return;
         const { settings } = payload;
         const path = this.kind === "fade" ? "/fade"
             : settings.filename ? `/play/${encodeURIComponent(settings.filename)}` : undefined;
@@ -135,6 +152,12 @@ class FadeAction extends JinglesAction {
     readonly kind = "fade";
 }
 
+@action({ UUID: "de.maikpurrmann.jingles.countdown" })
+class CountdownAction extends JinglesAction {
+    readonly kind = "countdown";
+}
+
 streamDeck.actions.registerAction(new JingleAction());
 streamDeck.actions.registerAction(new FadeAction());
+streamDeck.actions.registerAction(new CountdownAction());
 streamDeck.connect();

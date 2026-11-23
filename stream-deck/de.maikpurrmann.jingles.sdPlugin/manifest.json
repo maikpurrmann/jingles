@@ -3,11 +3,11 @@
   "UUID": "de.maikpurrmann.jingles",
   "Name": "Jingles",
   "Author": "Maik Purrmann",
-  "Description": "Jingles und Pegelabsenkung steuern und ihren Status anzeigen.",
-  "Version": "0.5.0.1",
+  "Description": "Jingles und Pegelabsenkung steuern. Wiedergabe und Restzeit anzeigen.",
+  "Version": "0.5.0.2",
   "Icon": "images/plugin",
   "Category": "Jingles",
-  "CategoryIcon": "images/action",
+  "CategoryIcon": "images/waveform",
   "URL": "https://github.com/maikpurrmann/jingles",
   "CodePath": "bin/plugin.mjs",
   "PropertyInspectorPath": "inspector/index.html",
@@ -64,6 +64,24 @@
         {
           "Image": "images/fade-on",
           "Name": "Abgesenkt"
+        }
+      ]
+    },
+    {
+      "UUID": "de.maikpurrmann.jingles.countdown",
+      "Name": "Restzeit",
+      "Icon": "images/countdown-action",
+      "Tooltip": "Die verbleibende Zeit des laufenden Einspielers anzeigen.",
+      "Controllers": [
+        "Keypad"
+      ],
+      "SupportedInMultiActions": false,
+      "States": [
+        {
+          "Image": "images/jingle-off",
+          "TitleAlignment": "middle",
+          "FontStyle": "Bold",
+          "FontSize": 18
         }
       ]
     }

@@ -27,7 +27,9 @@ Jingles spielt jeweils eine Datei. Eigene Einspieler bleiben in deinem Soundboar
 
 ## Stream Deck
 
-### Plugin mit Statusanzeige
+Jingles lässt sich direkt im App-Fenster bedienen. Für Aufnahmen mit dem Stream Deck ist das Plugin der empfohlene Einstieg. Es zeigt den laufenden Jingle, die Pegelabsenkung und auf Wunsch die Restzeit.
+
+### Plugin einrichten
 
 Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-Plugin für Stream Deck](https://github.com/maikpurrmann/jingles/releases/download/v0.5.0/Jingles.streamDeckPlugin) und öffne die Datei per Doppelklick.
 
@@ -43,7 +45,9 @@ Die schwarze **Fade**-Taste bekommt bei aktiver Pegelabsenkung einen orangefarbe
 
 Wenn in der Dateiauswahl ein neuer Einspieler fehlt, aktualisiere den Ordner in Jingles und klicke in den Tasteneinstellungen auf **Neu laden**.
 
-### Steuerung über Links
+### Vorhandene Tasten mit Steuerlinks
+
+Die bisherigen Tasten mit lokalen HTTP-GET-Anfragen funktionieren auch mit Jingles 0.5.0. Sie lösen Wiedergabe, Play/Pause oder Fade aus. Für die Statusanzeige belegst du die gewünschten Tasten mit den Plugin-Aktionen.
 
 1. In Jingles das **Link-Symbol** in der Zeile des gewünschten Einspielers anklicken.
 2. Im Stream Deck eine Aktion **System → Webseite** anlegen, den Link einfügen und **GET-Anfrage im Hintergrund** wählen.

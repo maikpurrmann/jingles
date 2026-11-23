@@ -4,7 +4,7 @@
   "Name": "Jingles",
   "Author": "Maik Purrmann",
   "Description": "Jingles und Pegelabsenkung steuern. Wiedergabe und Restzeit anzeigen.",
-  "Version": "0.5.0.6",
+  "Version": "0.5.0.7",
   "Icon": "images/plugin",
   "Category": "Jingles",
   "CategoryIcon": "images/waveform",
@@ -33,19 +33,10 @@
       "Controllers": [
         "Keypad"
       ],
-      "DisableAutomaticStates": true,
       "SupportedInMultiActions": false,
       "States": [
         {
           "Image": "images/jingle-off",
-          "Name": "Bereit",
-          "Title": "Jingle",
-          "TitleAlignment": "middle",
-          "FontSize": 14
-        },
-        {
-          "Image": "images/jingle-on",
-          "Name": "Spielt",
           "Title": "Jingle",
           "TitleAlignment": "middle",
           "FontSize": 14

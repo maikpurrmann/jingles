@@ -37,6 +37,10 @@ Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-P
 2. Im Stream Deck die Aktion **Jingles → Jingle** auf einen Tastenplatz ziehen. In den Einstellungen der Taste unter **Einspieler** die gewünschte Datei wählen. Für weitere Einspieler kannst du jeweils eine weitere Taste belegen.
 3. Die Aktion **Jingles → Fade** auf einen Tastenplatz ziehen. Optional **Jingles → Restzeit** auf eine weitere Taste legen. Sie zeigt die Restzeit des laufenden Einspielers und steht ohne Wiedergabe auf `0:00`. Lass ihr Titelfeld frei, damit der Countdown angezeigt wird.
 
+<img src="docs/jingles-stream-deck.png" alt="Stream Deck XL mit Einspieler-Tasten, Ducking und Restzeit. Die ausgewählte Taste Applaus ist mit der Jingles-Aktion Jingle und der Datei 10_Applaus.wav belegt." width="500">
+
+Das Beispiel aus **Planlosgelöst** zeigt die Taste **Applaus** mit ihrer Dateiauswahl. **Ducking** ist der eigene Titel für die Fade-Aktion. Die beiden rechten Tasten bedienen OBS.
+
 Unter **App** ist bei allen drei Aktionen **Jingles** voreingestellt. Für einen Test mit dem separaten Vorschau-Build wählst du **Jingles Vorschau**.
 
 Die Taste ist standardmäßig mit **Jingle** beschriftet. Gib im Stream-Deck-Feld **Titel** deinen eigenen Namen ein. Der Titel bleibt beim Starten und Stoppen erhalten. Der grüne Rand zeigt an, welcher Jingle gerade spielt. Er läuft im Uhrzeigersinn ab und zeigt so den Wiedergabefortschritt. Ein weiterer Druck stoppt den Jingle.

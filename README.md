@@ -4,7 +4,7 @@ Jingles ist ein macOS-Soundboard für Podcasts und Live-Aufnahmen. Spiele WAV- u
 
 ## Download und Installation
 
-**[Jingles 0.5.4 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.5.4/Jingles-0.5.4-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.5.4)
+**[Jingles 0.5.5 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.5.5/Jingles-0.5.5-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.5.5)
 
 <img src="docs/jingles-app-wiedergabe.png" alt="Jingles während der Wiedergabe: Das laufende Outro ist mit einer türkisen Wellenform markiert. Restzeit, Wiedergabetasten und Fade stehen unten." width="500">
 
@@ -25,13 +25,19 @@ Der Download ist lokal signiert und bislang ohne Apple-Notarisierung. Wenn macOS
 
 Jingles spielt jeweils eine Datei. Eigene Einspieler bleiben in deinem Soundboard-Ordner. Unterordner werden beim Einlesen übersprungen.
 
+### Darstellung
+
+Ab Jingles 0.5.5 stehen im macOS-Menü **Darstellung** die Ansichten **Standard** und **Studio** zur Wahl. Jingles merkt sich die gewählte Ansicht. Du kannst auch während der Wiedergabe wechseln.
+
+In **Studio** schaltet der orange Wippschalter in der Fade-Zeile die Pegelabsenkung um. Zielpegel, Fade runter und Fade hoch stellst du direkt an den drei Drehreglern ein, indem du sie nach oben oder unten ziehst. In **Standard** findest du dieselben Werte im Fade-Einstellmenü.
+
 ## Stream Deck
 
 Jingles lässt sich direkt im App-Fenster bedienen. Für Aufnahmen mit dem Stream Deck ist das Plugin der empfohlene Einstieg. Es zeigt den laufenden Jingle, die Pegelabsenkung und auf Wunsch die Restzeit.
 
 ### Plugin einrichten
 
-Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-Plugin für Stream Deck](https://github.com/maikpurrmann/jingles/releases/download/v0.5.4/Jingles.streamDeckPlugin) und öffne die Datei per Doppelklick.
+Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-Plugin für Stream Deck](https://github.com/maikpurrmann/jingles/releases/download/v0.5.5/Jingles.streamDeckPlugin) und öffne die Datei per Doppelklick.
 
 1. Jingles öffnen und den Einspielerordner wählen.
 2. Im Stream Deck die Aktion **Jingles → Jingle** auf einen Tastenplatz ziehen. In den Einstellungen der Taste unter **Einspieler** die gewünschte Datei wählen. Für weitere Einspieler kannst du jeweils eine weitere Taste belegen.
@@ -85,7 +91,7 @@ Ab Jingles 0.5.3 liefert `http://127.0.0.1:17639/obs/jingle` eine transparente R
 
 Wenn der Countdown nur im Gesprächsbild sichtbar sein soll, lege in OBS eine Szene **Ninja** an und binde die Aufnahmeszene als Szenenquelle ein. Füge darüber die Browserquelle hinzu. Wähle in den Einstellungen der virtuellen Kamera **Szene → Ninja**. Die OBS-Aufnahme verwendet die normale Programmszene. VDO.Ninja verwendet **OBS Virtual Camera** als Kamera. [OBS zur virtuellen Kamera](https://obsproject.com/kb/virtual-camera-guide)
 
-Für die **Aufnahmezeit** lade das [OBS-Paket](https://github.com/maikpurrmann/jingles/releases/download/v0.5.4/Jingles-OBS-Aufnahmezeit.zip) und entpacke `RecordingTimer.lua` und `RecordingTimer.html` gemeinsam in einem beschreibbaren Ordner. Lade die Lua-Datei über **Werkzeuge → Skripte**. Füge die HTML-Datei als lokale Browserquelle in **Ninja** hinzu. Verwende für beide Einblendungen dieselben Quellabmessungen und richte die Aufnahmezeit am rechten Bildrand aus. Die Uhr läuft direkt in OBS.
+Für die **Aufnahmezeit** lade das [OBS-Paket](https://github.com/maikpurrmann/jingles/releases/download/v0.5.5/Jingles-OBS-Aufnahmezeit.zip) und entpacke `RecordingTimer.lua` und `RecordingTimer.html` gemeinsam in einem beschreibbaren Ordner. Lade die Lua-Datei über **Werkzeuge → Skripte**. Füge die HTML-Datei als lokale Browserquelle in **Ninja** hinzu. Verwende für beide Einblendungen dieselben Quellabmessungen und richte die Aufnahmezeit am rechten Bildrand aus. Die Uhr läuft direkt in OBS.
 
 ## Aus dem Quellcode bauen
 

@@ -6,9 +6,10 @@ struct PlaybackProgressBar: NSViewRepresentable {
     let progress: Double
     let duration: TimeInterval
     let run: UInt64?
+    var tint: NSColor? = nil
 
     func makeNSView(context: Context) -> PlaybackTrackView {
-        PlaybackTrackView(frame: .zero)
+        PlaybackTrackView(frame: .zero, tint: tint)
     }
 
     func updateNSView(_ view: PlaybackTrackView, context: Context) {
@@ -18,9 +19,11 @@ struct PlaybackProgressBar: NSViewRepresentable {
 
 final class PlaybackTrackView: NSView {
     private let fill = CALayer()
+    private let tint: NSColor?
     private var currentRun: UInt64?
 
-    override init(frame frameRect: NSRect) {
+    init(frame frameRect: NSRect, tint: NSColor?) {
+        self.tint = tint
         super.init(frame: frameRect)
         wantsLayer = true
         fill.anchorPoint = CGPoint(x: 0, y: 0.5)
@@ -73,7 +76,7 @@ final class PlaybackTrackView: NSView {
         effectiveAppearance.performAsCurrentDrawingAppearance {
             CATransaction.begin()
             CATransaction.setDisableActions(true)
-            fill.backgroundColor = NSColor.controlAccentColor.cgColor
+            fill.backgroundColor = (tint ?? .controlAccentColor).cgColor
             CATransaction.commit()
         }
     }

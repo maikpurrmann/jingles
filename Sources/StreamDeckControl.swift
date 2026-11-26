@@ -45,6 +45,7 @@ enum StreamDeckCommand {
     case overlayStatus
     case jingles
     case toggle
+    case pauseOrResume
     case play(String)
     case fade
 
@@ -72,6 +73,10 @@ enum StreamDeckCommand {
             self = .toggle
             return
         }
+        if target == "/pause-toggle" {
+            self = .pauseOrResume
+            return
+        }
         if target == "/fade" {
             self = .fade
             return
@@ -87,7 +92,7 @@ enum StreamDeckCommand {
     var link: String? {
         let root = "http://\(Self.host):\(Self.port)"
         switch self {
-        case .status, .overlayStatus, .jingles:
+        case .status, .overlayStatus, .jingles, .pauseOrResume:
             return nil
         case .toggle:
             return root + "/toggle"

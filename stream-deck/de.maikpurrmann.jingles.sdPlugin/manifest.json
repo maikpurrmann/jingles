@@ -4,7 +4,7 @@
   "Name": "Jingles",
   "Author": "Maik Purrmann",
   "Description": "Jingles und Pegelabsenkung steuern. Wiedergabe und Restzeit anzeigen.",
-  "Version": "0.5.0.8",
+  "Version": "0.5.0.9",
   "Icon": "images/plugin",
   "Category": "Jingles",
   "CategoryIcon": "images/waveform",
@@ -66,7 +66,7 @@
       "UUID": "de.maikpurrmann.jingles.countdown",
       "Name": "Restzeit",
       "Icon": "images/countdown-action",
-      "Tooltip": "Die verbleibende Zeit des laufenden Einspielers anzeigen.",
+      "Tooltip": "Die Restzeit anzeigen. Drücken, um den Einspieler zu pausieren oder fortzusetzen.",
       "Controllers": [
         "Keypad"
       ],

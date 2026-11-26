@@ -6,7 +6,9 @@ Jingles ist ein macOS-Soundboard für Podcasts und Live-Aufnahmen. Spiele WAV- u
 
 **[Jingles 0.5.5 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.5.5/Jingles-0.5.5-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.5.5)
 
-<img src="docs/jingles-app-wiedergabe.png" alt="Jingles während der Wiedergabe: Das laufende Outro ist mit einer türkisen Wellenform markiert. Restzeit, Wiedergabetasten und Fade stehen unten." width="500">
+| Standard | Studio |
+| --- | --- |
+| <img src="docs/jingles-app-wiedergabe.png" alt="Standardansicht mit laufendem Outro, türkiser Wellenform und Restzeitanzeige." width="330"> | <img src="docs/jingles-studio-wiedergabe.png" alt="Studio-Ansicht mit Holzrahmen, laufendem Intro, bernsteinfarbener Restzeit und drei Fade-Drehreglern." width="378"> |
 
 Voraussetzung für den fertigen Download ist ein Mac mit Apple-Chip und macOS 13 Ventura oder neuer.
 
@@ -19,8 +21,8 @@ Der Download ist lokal signiert und bislang ohne Apple-Notarisierung. Wenn macOS
 ## Bedienung
 
 - Ein Klick auf die Zeile wählt den nächsten Jingle vor. Die laufende Wiedergabe geht weiter. Die untere Play-Taste startet die Vorauswahl. Das Play-Symbol in der Zeile startet diese Datei von vorn.
-- Der laufende Jingle hat ein türkises Play-Symbol und eine Wellenform. Die große Restzeit und der Fortschrittsbalken stehen bei den Wiedergabetasten. **Pause** hält die Position, **Stopp** setzt sie zurück.
-- Der Prozentknopf schaltet den globalen Jingle-Pegel zwischen **100 %** und dem eingestellten Zielpegel um. Der Pegel gilt auch für den nächsten Einspieler. Über das Regler-Symbol lassen sich Zielpegel und beide Fade-Zeiten einstellen. Die Vorgaben sind **10 %**, **0,3 s** abwärts und **3,0 s** aufwärts.
+- Play-Symbol und Wellenform markieren den laufenden Jingle in Türkis (**Standard**) oder Bernstein (**Studio**). Die große Restzeit und der Fortschrittsbalken stehen bei den Wiedergabetasten. **Pause** hält die Position, **Stopp** setzt sie zurück.
+- **Fade** schaltet den globalen Jingle-Pegel zwischen **100 %** und dem eingestellten Zielpegel um. Der Pegel gilt auch für den nächsten Einspieler. Die Vorgaben sind **10 %**, **0,3 s** abwärts und **3,0 s** aufwärts.
 - Über **ⓘ** findest du die Bedienhilfe sowie Version und Build-Datum.
 
 Jingles spielt jeweils eine Datei. Eigene Einspieler bleiben in deinem Soundboard-Ordner. Unterordner werden beim Einlesen übersprungen.

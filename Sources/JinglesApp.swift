@@ -1,18 +1,44 @@
 import AppKit
 import SwiftUI
 
+private enum JinglesAppearance: String, CaseIterable, Identifiable {
+    case standard, studio
+
+    var id: Self { self }
+    var title: String { self == .standard ? "Standard" : "Studio" }
+}
+
+private struct AppearancePicker: View {
+    @Binding var appearance: JinglesAppearance
+
+    var body: some View {
+        Picker("Darstellung", selection: $appearance) {
+            ForEach(JinglesAppearance.allCases) { option in
+                Text(option.title).tag(option)
+            }
+        }
+    }
+}
+
 @main
 struct JinglesApp: App {
     @NSApplicationDelegateAdaptor(JinglesApplicationDelegate.self) private var applicationDelegate
     @StateObject private var player = JinglePlayer()
+    @AppStorage("jinglesAppearance") private var appearance = JinglesAppearance.standard
 
     var body: some Scene {
         Window(Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "Jingles", id: "player") {
-            JinglesView(player: player)
+            JinglesView(player: player, appearance: appearance)
+                .preferredColorScheme(appearance == .studio ? .dark : nil)
         }
         .defaultSize(width: 620, height: 470)
         .windowResizability(.contentMinSize)
         .commands {
+            CommandGroup(after: .toolbar) {
+                Divider()
+                AppearancePicker(appearance: $appearance)
+                    .pickerStyle(.inline)
+            }
             CommandMenu("Stream Deck") {
                 Button("Link für ausgewählten Jingle kopieren") {
                     if let filename = player.selectedFilename {
@@ -38,21 +64,28 @@ private final class JinglesApplicationDelegate: NSObject, NSApplicationDelegate 
 
 private struct JinglesView: View {
     @ObservedObject var player: JinglePlayer
+    let appearance: JinglesAppearance
     @StateObject private var popovers = PopoverPresentation()
+
+    private var isStudio: Bool { appearance == .studio }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 8) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("Jingles")
-                        .font(.system(size: 30, weight: .semibold))
-                        .accessibilityAddTraits(.isHeader)
-                    Text(player.folder?.lastPathComponent ?? "Kein Ordner ausgewählt")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
-                        .help(player.folder?.path ?? "")
+                if isStudio {
+                    StudioNameplate(folder: player.folder)
+                } else {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Jingles")
+                            .font(.system(size: 30, weight: .semibold))
+                            .accessibilityAddTraits(.isHeader)
+                        Text(player.folder?.lastPathComponent ?? "Kein Ordner ausgewählt")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                            .help(player.folder?.path ?? "")
+                    }
                 }
                 Spacer()
                 Button(action: player.refresh) {
@@ -83,6 +116,8 @@ private struct JinglesView: View {
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
                 Spacer(minLength: 40)
+            } else if isStudio {
+                studioList
             } else {
                 List(player.files, id: \.self, selection: Binding(
                     get: { player.selectedFilename },
@@ -93,29 +128,10 @@ private struct JinglesView: View {
                 }
                 .listStyle(.bordered)
             }
-            VStack(spacing: 8) {
-                HStack(spacing: 8) {
-                    transportControls
-                    Spacer(minLength: 0)
-                    playbackClock
-                    Spacer(minLength: 0)
-                    fadeControls
-                }
-                .labelStyle(.iconOnly)
-                .controlSize(.large)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                PlaybackProgressBar(
-                    progress: player.playbackProgress,
-                    duration: player.playbackDuration,
-                    run: player.canPause ? player.playbackRun : nil
-                )
-                .frame(maxWidth: .infinity)
-                .frame(height: 7)
-                .background(.quaternary, in: Capsule())
-                .clipShape(Capsule())
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel("Wiedergabefortschritt")
-                .accessibilityValue("\(Int(player.playbackProgress * 100)) Prozent")
+            if isStudio {
+                StudioConsole(player: player)
+            } else {
+                standardConsole
             }
             if let message = player.message {
                 Text(message)
@@ -133,8 +149,41 @@ private struct JinglesView: View {
                     .foregroundStyle(.red)
             }
         }
-        .padding(22)
-        .frame(minWidth: 500, minHeight: 330)
+        .padding(.vertical, 22)
+        .padding(.horizontal, isStudio ? 34 : 22)
+        .frame(minWidth: isStudio ? 590 : 500, minHeight: isStudio ? 390 : 330)
+        .background {
+            if isStudio {
+                StudioCase()
+            }
+        }
+    }
+
+    private var standardConsole: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 8) {
+                transportControls
+                Spacer(minLength: 0)
+                playbackClock
+                Spacer(minLength: 0)
+                fadeControls
+            }
+            .labelStyle(.iconOnly)
+            .controlSize(.large)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            PlaybackProgressBar(
+                progress: player.playbackProgress,
+                duration: player.playbackDuration,
+                run: player.canPause ? player.playbackRun : nil
+            )
+            .frame(maxWidth: .infinity)
+            .frame(height: 7)
+            .background(.quaternary, in: Capsule())
+            .clipShape(Capsule())
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Wiedergabefortschritt")
+            .accessibilityValue("\(Int(player.playbackProgress * 100)) Prozent")
+        }
     }
 
     private var playbackClock: some View {
@@ -201,17 +250,21 @@ private struct JinglesView: View {
             .accessibilityLabel(action)
             .accessibilityValue("\(state), \(level) Prozent")
 
-            Button {
-                popovers.showsFadeSettings.toggle()
-            } label: {
-                Label("Fade-Einstellungen", systemImage: "slider.horizontal.3")
-            }
-            .help("Fade-Einstellungen")
-            .popover(isPresented: $popovers.showsFadeSettings, arrowEdge: .top) {
-                fadeSettings
-            }
+            fadeSettingsButton
         }
         .controlSize(.regular)
+    }
+
+    private var fadeSettingsButton: some View {
+        Button {
+            popovers.showsFadeSettings.toggle()
+        } label: {
+            Label("Fade-Einstellungen", systemImage: "slider.horizontal.3")
+        }
+        .help("Fade-Einstellungen")
+        .popover(isPresented: $popovers.showsFadeSettings, arrowEdge: .top) {
+            fadeSettings
+        }
     }
 
     private var fadeSettings: some View {
@@ -236,10 +289,39 @@ private struct JinglesView: View {
         seconds.formatted(.number.precision(.fractionLength(1))) + " s"
     }
 
+    private var studioList: some View {
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                ForEach(player.files, id: \.self) { file in
+                    let selected = file.lastPathComponent == player.selectedFilename
+                    jingleRow(file)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(selected ? StudioPalette.amber.opacity(0.15) : .clear)
+                        .overlay(alignment: .leading) {
+                            if selected {
+                                Rectangle().fill(StudioPalette.amber).frame(width: 2)
+                            }
+                        }
+                        .overlay(alignment: .bottom) {
+                            Rectangle().fill(StudioPalette.cream.opacity(0.09)).frame(height: 1)
+                        }
+                }
+            }
+        }
+        .background(Color(white: 0.095))
+        .clipShape(RoundedRectangle(cornerRadius: 5))
+        .overlay {
+            RoundedRectangle(cornerRadius: 5).strokeBorder(StudioPalette.cream.opacity(0.20))
+                .allowsHitTesting(false)
+        }
+    }
+
     private func jingleRow(_ file: URL) -> some View {
         let name = file.lastPathComponent
         let remaining = name == player.currentFilename ? player.remainingSeconds : nil
         let isPlaying = remaining != nil && player.canPause
+        let playingColor = isStudio ? StudioPalette.amber : Color.mint
         let timeColor: Color = if name == player.selectedFilename {
             .primary
         } else if remaining != nil {
@@ -253,20 +335,43 @@ private struct JinglesView: View {
                 player.play(named: name)
             } label: {
                 Image(systemName: "play.fill")
-                    .foregroundStyle(isPlaying ? Color.mint : Color.secondary)
+                    .foregroundStyle(isPlaying ? playingColor : Color.secondary)
                     .frame(width: 24, height: 24)
-                    .background(Color.mint.opacity(isPlaying ? 0.16 : 0), in: Circle())
+                    .background(playingColor.opacity(isPlaying ? 0.16 : 0), in: Circle())
                     .contentShape(Rectangle())
             }
             .help("„\(name)“ von Anfang an abspielen")
             .accessibilityLabel("„\(name)“ abspielen")
+            if isStudio {
+                Button {
+                    player.select(name)
+                } label: {
+                    jingleRowDetails(name, file: file, remaining: remaining, isPlaying: isPlaying,
+                                     playingColor: playingColor, timeColor: timeColor)
+                        .contentShape(Rectangle())
+                        .frame(minHeight: 24)
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(name == player.selectedFilename ? .isSelected : [])
+            } else {
+                jingleRowDetails(name, file: file, remaining: remaining, isPlaying: isPlaying,
+                                 playingColor: playingColor, timeColor: timeColor)
+            }
+        }
+        .buttonStyle(.borderless)
+        .padding(.vertical, 3)
+    }
+
+    private func jingleRowDetails(_ name: String, file: URL, remaining: Int?, isPlaying: Bool,
+                                  playingColor: Color, timeColor: Color) -> some View {
+        HStack(spacing: 12) {
             Text(name)
                 .lineLimit(1)
                 .truncationMode(.middle)
                 .help(name)
             Spacer()
             Image(systemName: "waveform")
-                .foregroundStyle(Color.mint)
+                .foregroundStyle(playingColor)
                 .opacity(isPlaying ? 1 : 0)
                 .accessibilityHidden(true)
             Text(timeLabel(remaining ?? player.durations[file]))
@@ -276,8 +381,6 @@ private struct JinglesView: View {
                 .accessibilityLabel(isPlaying ? "Läuft, Restzeit" : remaining == nil ? "Dauer" : "Restzeit")
                 .accessibilityValue(timeLabel(remaining ?? player.durations[file]))
         }
-        .buttonStyle(.borderless)
-        .padding(.vertical, 3)
     }
 
     private func timeLabel(_ seconds: Int?) -> String {

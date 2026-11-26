@@ -4,7 +4,7 @@ Jingles ist ein macOS-Soundboard für Podcasts und Live-Aufnahmen. Spiele WAV- u
 
 ## Download und Installation
 
-**[Jingles 0.5.3 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.5.3/Jingles-0.5.3-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.5.3)
+**[Jingles 0.5.4 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.5.4/Jingles-0.5.4-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.5.4)
 
 <img src="docs/jingles-app-wiedergabe.png" alt="Jingles während der Wiedergabe: Das laufende Outro ist mit einer türkisen Wellenform markiert. Restzeit, Wiedergabetasten und Fade stehen unten." width="500">
 
@@ -31,7 +31,7 @@ Jingles lässt sich direkt im App-Fenster bedienen. Für Aufnahmen mit dem Strea
 
 ### Plugin einrichten
 
-Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-Plugin für Stream Deck](https://github.com/maikpurrmann/jingles/releases/download/v0.5.3/Jingles.streamDeckPlugin) und öffne die Datei per Doppelklick.
+Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-Plugin für Stream Deck](https://github.com/maikpurrmann/jingles/releases/download/v0.5.4/Jingles.streamDeckPlugin) und öffne die Datei per Doppelklick.
 
 1. Jingles öffnen und den Einspielerordner wählen.
 2. Im Stream Deck die Aktion **Jingles → Jingle** auf einen Tastenplatz ziehen. In den Einstellungen der Taste unter **Einspieler** die gewünschte Datei wählen. Für weitere Einspieler kannst du jeweils eine weitere Taste belegen.
@@ -42,6 +42,8 @@ Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-P
 Das Beispiel aus **Planlosgelöst** zeigt die Taste **Applaus** mit ihrer Dateiauswahl. **Ducking** ist der eigene Titel für die Fade-Aktion. Die beiden rechten Tasten bedienen OBS.
 
 Unter **App** ist bei allen drei Aktionen **Jingles** voreingestellt. Für einen Test mit dem separaten Vorschau-Build wählst du **Jingles Vorschau**.
+
+Mit Jingles ab **0.5.4** und dem aktualisierten Plugin kannst du die Taste **Restzeit** auch zum Pausieren und Fortsetzen drücken. In der Pause bleibt die Zeit mit einem orangefarbenen Rand stehen. Bei `0:00` ohne Einspieler bleibt ein Tastendruck ohne Wirkung. Die vorhandene Tastenbelegung gilt weiter.
 
 Die Taste ist standardmäßig mit **Jingle** beschriftet. Gib im Stream-Deck-Feld **Titel** deinen eigenen Namen ein. Der Titel bleibt beim Starten und Stoppen erhalten. Der grüne Rand zeigt an, welcher Jingle gerade spielt. Er läuft im Uhrzeigersinn ab und zeigt so den Wiedergabefortschritt. Ein weiterer Druck stoppt den Jingle.
 
@@ -81,7 +83,7 @@ Ab Jingles 0.5.3 liefert `http://127.0.0.1:17639/obs/jingle` eine transparente R
 
 Wenn der Countdown nur im Gesprächsbild sichtbar sein soll, lege in OBS eine Szene **Ninja** an und binde die Aufnahmeszene als Szenenquelle ein. Füge darüber die Browserquelle hinzu. Wähle in den Einstellungen der virtuellen Kamera **Szene → Ninja**. Die OBS-Aufnahme verwendet die normale Programmszene. VDO.Ninja verwendet **OBS Virtual Camera** als Kamera. [OBS zur virtuellen Kamera](https://obsproject.com/kb/virtual-camera-guide)
 
-Für die **Aufnahmezeit** lade das [OBS-Paket](https://github.com/maikpurrmann/jingles/releases/download/v0.5.3/Jingles-OBS-Aufnahmezeit.zip) und entpacke `RecordingTimer.lua` und `RecordingTimer.html` gemeinsam in einem beschreibbaren Ordner. Lade die Lua-Datei über **Werkzeuge → Skripte**. Füge die HTML-Datei als lokale Browserquelle in **Ninja** hinzu. Verwende für beide Einblendungen dieselben Quellabmessungen und richte die Aufnahmezeit am rechten Bildrand aus. Die Uhr läuft direkt in OBS.
+Für die **Aufnahmezeit** lade das [OBS-Paket](https://github.com/maikpurrmann/jingles/releases/download/v0.5.4/Jingles-OBS-Aufnahmezeit.zip) und entpacke `RecordingTimer.lua` und `RecordingTimer.html` gemeinsam in einem beschreibbaren Ordner. Lade die Lua-Datei über **Werkzeuge → Skripte**. Füge die HTML-Datei als lokale Browserquelle in **Ninja** hinzu. Verwende für beide Einblendungen dieselben Quellabmessungen und richte die Aufnahmezeit am rechten Bildrand aus. Die Uhr läuft direkt in OBS.
 
 ## Aus dem Quellcode bauen
 

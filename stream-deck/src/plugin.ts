@@ -8,6 +8,7 @@ type Status = {
     playingFilename: string | null;
     isLowered: boolean;
     remainingSeconds?: number | null;
+    pausedRemainingSeconds?: number | null;
     playbackProgress?: number | null;
 };
 type Kind = "jingle" | "fade" | "countdown";
@@ -16,6 +17,7 @@ type VisibleKey = {
     kind: Kind;
     settings: Settings;
     fadeActive?: boolean;
+    countdownPaused?: boolean;
     progressStep?: number;
     title?: string;
 };
@@ -47,9 +49,8 @@ function schedulePoll(delay: number): void {
     }, delay);
 }
 
-function countdownTitle(status?: Status): string {
-    const seconds = status?.remainingSeconds;
-    if (!status?.playingFilename || typeof seconds !== "number" || !Number.isSafeInteger(seconds) || seconds < 0) {
+function countdownTitle(seconds?: number | null): string {
+    if (typeof seconds !== "number" || !Number.isSafeInteger(seconds) || seconds < 0) {
         return "0:00";
     }
     return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
@@ -87,10 +88,16 @@ async function poll(): Promise<void> {
             for (const entry of visibleKeys.values()) {
                 if (portFor(entry.settings) !== port) continue;
                 if (entry.kind === "countdown") {
-                    const title = countdownTitle(status);
+                    const pausedSeconds = status?.pausedRemainingSeconds;
+                    const paused = typeof pausedSeconds === "number";
+                    const title = countdownTitle(pausedSeconds ?? (status?.playingFilename ? status.remainingSeconds : null));
                     if (entry.title !== title) {
                         await entry.key.setTitle(title);
                         entry.title = title;
+                    }
+                    if (entry.countdownPaused !== paused) {
+                        await entry.key.setImage(paused ? "images/fade-on.svg" : undefined, { target: Target.HardwareAndSoftware });
+                        entry.countdownPaused = paused;
                     }
                     continue;
                 }
@@ -151,10 +158,15 @@ abstract class JinglesAction extends SingletonAction<Settings> {
     }
 
     override async onKeyDown({ action: key, payload }: KeyDownEvent<Settings>): Promise<void> {
-        if (this.kind === "countdown") return;
         const { settings } = payload;
-        const path = this.kind === "fade" ? "/fade"
-            : settings.filename ? `/play/${encodeURIComponent(settings.filename)}` : undefined;
+        let path: string | undefined;
+        switch (this.kind) {
+            case "countdown": path = "/pause-toggle"; break;
+            case "fade": path = "/fade"; break;
+            case "jingle":
+                if (settings.filename) path = `/play/${encodeURIComponent(settings.filename)}`;
+                break;
+        }
         if (!path) {
             await key.showAlert();
             return;

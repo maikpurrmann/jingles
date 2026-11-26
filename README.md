@@ -35,7 +35,7 @@ Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-P
 
 1. Jingles öffnen und den Einspielerordner wählen.
 2. Im Stream Deck die Aktion **Jingles → Jingle** auf einen Tastenplatz ziehen. In den Einstellungen der Taste unter **Einspieler** die gewünschte Datei wählen. Für weitere Einspieler kannst du jeweils eine weitere Taste belegen.
-3. Die Aktion **Jingles → Fade** auf einen Tastenplatz ziehen. Optional **Jingles → Restzeit** auf eine weitere Taste legen. Sie zeigt die Restzeit des laufenden Einspielers und steht ohne Wiedergabe auf `0:00`. Lass ihr Titelfeld frei, damit der Countdown angezeigt wird.
+3. Die Aktion **Jingles → Fade** auf einen Tastenplatz ziehen. Optional **Jingles → Restzeit** auf eine weitere Taste legen. Lass ihr Titelfeld frei, damit der Countdown angezeigt wird.
 
 <img src="docs/jingles-stream-deck.png" alt="Stream Deck XL mit Einspieler-Tasten, Ducking und Restzeit. Die ausgewählte Taste Applaus ist mit der Jingles-Aktion Jingle und der Datei 10_Applaus.wav belegt." width="500">
 
@@ -45,9 +45,11 @@ Unter **App** ist bei allen drei Aktionen **Jingles** voreingestellt. Für einen
 
 Mit Jingles ab **0.5.4** und dem aktualisierten Plugin kannst du die Taste **Restzeit** auch zum Pausieren und Fortsetzen drücken. In der Pause bleibt die Zeit mit einem orangefarbenen Rand stehen. Bei `0:00` ohne Einspieler bleibt ein Tastendruck ohne Wirkung. Die vorhandene Tastenbelegung gilt weiter.
 
-Die Taste ist standardmäßig mit **Jingle** beschriftet. Gib im Stream-Deck-Feld **Titel** deinen eigenen Namen ein. Der Titel bleibt beim Starten und Stoppen erhalten. Der grüne Rand zeigt an, welcher Jingle gerade spielt. Er läuft im Uhrzeigersinn ab und zeigt so den Wiedergabefortschritt. Ein weiterer Druck stoppt den Jingle.
+Die Einspieler-Taste ist standardmäßig mit **Jingle** beschriftet. Gib im Stream-Deck-Feld **Titel** deinen eigenen Namen ein. Der Titel bleibt beim Starten und Stoppen erhalten. Der grüne Rand zeigt an, welcher Jingle gerade spielt. Er läuft im Uhrzeigersinn ab und zeigt so den Wiedergabefortschritt. Ein weiterer Druck stoppt den Jingle.
 
-Die schwarze **Fade**-Taste bekommt bei aktiver Pegelabsenkung einen orangefarbenen Rand. Beide Tasten zeigen auch Änderungen aus dem App-Fenster an. Falls du eigene Tastenbilder gesetzt hast, setze sie auf die Plugin-Bilder zurück, damit die Ränder erscheinen.
+In der Pause erlischt der grüne Rand. Ein Druck auf die Taste des pausierten Jingles startet ihn von vorn. Die **Restzeit**-Taste und der **Play/Pause**-Link setzen ihn an derselben Stelle fort.
+
+Die schwarze **Fade**-Taste bekommt bei aktiver Pegelabsenkung einen orangefarbenen Rand. Eigene Titel wie **Ducking** bleiben beim Umschalten sichtbar. Die Anzeigen folgen auch Änderungen aus dem App-Fenster. Falls du eigene Tastenbilder gesetzt hast, setze sie auf die Plugin-Bilder zurück, damit die Ränder erscheinen.
 
 Wenn in der Dateiauswahl ein neuer Einspieler fehlt, aktualisiere den Ordner in Jingles und klicke in den Tasteneinstellungen auf **Neu laden**.
 
@@ -113,4 +115,4 @@ npm ci
 npm run package
 ```
 
-Der Installer liegt danach unter `build/de.maikpurrmann.jingles.streamDeckPlugin` im Repository.
+`npm run package` prüft den TypeScript-Code, baut das Plugin-Bundle neu und validiert es vor dem Packen. Der Installer liegt danach unter `build/de.maikpurrmann.jingles.streamDeckPlugin` im Repository. Auf GitHub heißt der Installer `Jingles.streamDeckPlugin`.

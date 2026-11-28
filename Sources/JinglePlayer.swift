@@ -47,6 +47,21 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         guard elapsed.isFinite else { return 0 }
         return min(max(0, elapsed / audio.duration), 1)
     }
+    /// Jingle level right now, 0...1, including a running fade.
+    var masterLevel: Float { masterRamp.level(at: ProcessInfo.processInfo.systemUptime) }
+    var isFading: Bool { masterRamp.remaining(at: ProcessInfo.processInfo.systemUptime) > 0 }
+    var playbackSampleRate: Double? { audio.map { $0.format.sampleRate } }
+    var playbackChannelCount: Int? { audio.map(\.numberOfChannels) }
+
+    /// Current output level per channel, 0...1, for level displays. Empty unless playing.
+    func meterLevels() -> [Float] {
+        guard state == .playing, let audio else { return [] }
+        audio.updateMeters()
+        return (0..<audio.numberOfChannels).map { channel in
+            let power = audio.averagePower(forChannel: channel)
+            return power.isFinite ? min(max((power + 48) / 48, 0), 1) : 0
+        }
+    }
 
     private let folderKey = "jingleFolderPath"
     private let filenameKey = "lastJingleFilename"
@@ -207,6 +222,7 @@ final class JinglePlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
         do {
             let next = try AVAudioPlayer(contentsOf: file)
             next.delegate = self
+            next.isMeteringEnabled = true
             clearPlayback()
             currentFilename = file.lastPathComponent
             if nextFilename == currentFilename { nextFilename = nil }

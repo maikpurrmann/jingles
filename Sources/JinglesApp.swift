@@ -38,7 +38,8 @@ struct JinglesApp: App {
                 .preferredColorScheme(appearance == .standard ? nil : .dark)
         }
         .defaultSize(width: 620, height: 470)
-        .windowResizability(.contentMinSize)
+        // Retro has a fixed width like the old players, so the window follows its content size.
+        .windowResizability(appearance == .retro ? .contentSize : .contentMinSize)
         .commands {
             CommandGroup(after: .toolbar) {
                 Divider()

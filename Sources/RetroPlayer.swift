@@ -29,7 +29,8 @@ struct RetroPlayerView: View {
             statusLines
         }
         .padding(10)
-        .frame(minWidth: 560, minHeight: 440)
+        .frame(width: 480)
+        .frame(minHeight: 440)
         .background(RetroPalette.window)
     }
 

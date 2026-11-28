@@ -4,11 +4,11 @@ Jingles ist ein macOS-Soundboard für Podcasts und Live-Aufnahmen. Spiele WAV- u
 
 ## Download und Installation
 
-**[Jingles 0.5.6 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.5.6/Jingles-0.5.6-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.5.6)
+**[Jingles 0.5.7 für Apple-Chips herunterladen](https://github.com/maikpurrmann/jingles/releases/download/v0.5.7/Jingles-0.5.7-macos-arm64.zip)** · [Versionshinweise](https://github.com/maikpurrmann/jingles/releases/tag/v0.5.7)
 
 | Standard | Studio | Retro |
 | --- | --- | --- |
-| <img src="docs/jingles-app-wiedergabe.png" alt="Standardansicht mit laufendem Outro, türkiser Wellenform und Restzeitanzeige." width="250"> | <img src="docs/jingles-studio-wiedergabe.png" alt="Studio-Ansicht mit Holzrahmen, laufendem Intro, bernsteinfarbener Restzeit und drei Fade-Drehreglern." width="286"> | <img src="docs/jingles-retro-wiedergabe.png" alt="Retro-Ansicht mit grüner Pixel-Restzeit, Pegelbalken, Lauftext, gelb abgesenktem Pegel und grüner Playlist auf Schwarz." width="286"> |
+| <img src="docs/jingles-app-wiedergabe.png" alt="Standardansicht mit laufendem Outro, türkiser Wellenform und Restzeitanzeige." width="250"> | <img src="docs/jingles-studio-wiedergabe.png" alt="Studio-Ansicht mit Holzrahmen, laufendem Intro, bernsteinfarbener Restzeit und drei Fade-Drehreglern." width="286"> | <img src="docs/jingles-retro-wiedergabe.png" alt="Retro-Ansicht mit grüner Pixel-Restzeit, Pegelbalken, Lauftext, gelb abgesenktem Pegel und grüner Playlist auf Schwarz." width="241"> |
 
 Voraussetzung für den fertigen Download ist ein Mac mit Apple-Chip und macOS 13 Ventura oder neuer.
 
@@ -41,7 +41,7 @@ Jingles lässt sich direkt im App-Fenster bedienen. Für Aufnahmen mit dem Strea
 
 ### Plugin einrichten
 
-Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-Plugin für Stream Deck](https://github.com/maikpurrmann/jingles/releases/download/v0.5.6/Jingles.streamDeckPlugin) und öffne die Datei per Doppelklick.
+Du brauchst Jingles ab **0.5.0** und Stream Deck ab **7.1**. Lade das [Jingles-Plugin für Stream Deck](https://github.com/maikpurrmann/jingles/releases/download/v0.5.7/Jingles.streamDeckPlugin) und öffne die Datei per Doppelklick.
 
 1. Jingles öffnen und den Einspielerordner wählen.
 2. Im Stream Deck die Aktion **Jingles → Jingle** auf einen Tastenplatz ziehen. In den Einstellungen der Taste unter **Einspieler** die gewünschte Datei wählen. Für weitere Einspieler kannst du jeweils eine weitere Taste belegen.
@@ -95,7 +95,7 @@ Ab Jingles 0.5.3 liefert `http://127.0.0.1:17639/obs/jingle` eine transparente R
 
 Wenn der Countdown nur im Gesprächsbild sichtbar sein soll, lege in OBS eine Szene **Ninja** an und binde die Aufnahmeszene als Szenenquelle ein. Füge darüber die Browserquelle hinzu. Wähle in den Einstellungen der virtuellen Kamera **Szene → Ninja**. Die OBS-Aufnahme verwendet die normale Programmszene. VDO.Ninja verwendet **OBS Virtual Camera** als Kamera. [OBS zur virtuellen Kamera](https://obsproject.com/kb/virtual-camera-guide)
 
-Für die **Aufnahmezeit** lade das [OBS-Paket](https://github.com/maikpurrmann/jingles/releases/download/v0.5.6/Jingles-OBS-Aufnahmezeit.zip) und entpacke `RecordingTimer.lua` und `RecordingTimer.html` gemeinsam in einem beschreibbaren Ordner. Lade die Lua-Datei über **Werkzeuge → Skripte**. Füge die HTML-Datei als lokale Browserquelle in **Ninja** hinzu. Verwende für beide Einblendungen dieselben Quellabmessungen und richte die Aufnahmezeit am rechten Bildrand aus. Die Uhr läuft direkt in OBS.
+Für die **Aufnahmezeit** lade das [OBS-Paket](https://github.com/maikpurrmann/jingles/releases/download/v0.5.7/Jingles-OBS-Aufnahmezeit.zip) und entpacke `RecordingTimer.lua` und `RecordingTimer.html` gemeinsam in einem beschreibbaren Ordner. Lade die Lua-Datei über **Werkzeuge → Skripte**. Füge die HTML-Datei als lokale Browserquelle in **Ninja** hinzu. Verwende für beide Einblendungen dieselben Quellabmessungen und richte die Aufnahmezeit am rechten Bildrand aus. Die Uhr läuft direkt in OBS.
 
 ## Aus dem Quellcode bauen
 

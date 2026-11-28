@@ -12,6 +12,15 @@ private enum JinglesAppearance: String, CaseIterable, Identifiable {
         case .retro: "Retro"
         }
     }
+
+    /// Narrowest window content each appearance allows. Retro uses exactly this width.
+    var minimumWidth: CGFloat {
+        switch self {
+        case .standard: 500
+        case .studio: 590
+        case .retro: RetroPlayerView.width
+        }
+    }
 }
 
 private struct AppearancePicker: View {
@@ -36,6 +45,7 @@ struct JinglesApp: App {
         Window(Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "Jingles", id: "player") {
             JinglesView(player: player, appearance: appearance)
                 .preferredColorScheme(appearance == .standard ? nil : .dark)
+                .background(WindowWidthFollower(appearance: appearance))
         }
         .defaultSize(width: 620, height: 470)
         // Retro has a fixed width like the old players, so the window follows its content size.
@@ -56,6 +66,42 @@ struct JinglesApp: App {
 
                 Button("Fade-Link kopieren", action: player.copyFadeLink)
             }
+        }
+    }
+}
+
+/// Resizes the window when the appearance changes while the app runs. Standard and Retro snap to
+/// their narrow width; only Studio is wide and gets back the width it had last. At launch the
+/// window keeps its saved frame.
+private struct WindowWidthFollower: NSViewRepresentable {
+    let appearance: JinglesAppearance
+
+    final class Coordinator {
+        var appearance: JinglesAppearance?
+        var studioWidth: CGFloat?
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    func makeNSView(context: Context) -> NSView { NSView() }
+
+    func updateNSView(_ view: NSView, context: Context) {
+        let coordinator = context.coordinator
+        let previous = coordinator.appearance
+        guard previous != appearance else { return }
+        coordinator.appearance = appearance
+        guard previous != nil else { return }
+        let target = appearance
+        DispatchQueue.main.async { [weak view] in
+            guard let window = view?.window else { return }
+            var content = window.contentRect(forFrameRect: window.frame)
+            if previous == .studio { coordinator.studioWidth = content.width }
+            let width = target == .studio
+                ? max(coordinator.studioWidth ?? 0, target.minimumWidth)
+                : target.minimumWidth
+            guard abs(content.width - width) > 0.5 else { return }
+            content.size.width = width
+            window.setFrame(window.frameRect(forContentRect: content), display: true, animate: true)
         }
     }
 }
@@ -166,7 +212,7 @@ private struct JinglesView: View {
         }
         .padding(.vertical, 22)
         .padding(.horizontal, isStudio ? 34 : 22)
-        .frame(minWidth: isStudio ? 590 : 500, minHeight: isStudio ? 390 : 330)
+        .frame(minWidth: appearance.minimumWidth, minHeight: isStudio ? 390 : 330)
         .background {
             if isStudio {
                 StudioCase()

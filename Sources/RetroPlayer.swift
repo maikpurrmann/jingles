@@ -18,6 +18,8 @@ enum RetroPalette {
 }
 
 struct RetroPlayerView: View {
+    static let width: CGFloat = 480
+
     @ObservedObject var player: JinglePlayer
     private var showsInfo = State(initialValue: false)
     private var sliderNote = State<String?>(initialValue: nil)
@@ -29,7 +31,7 @@ struct RetroPlayerView: View {
             statusLines
         }
         .padding(10)
-        .frame(width: 480)
+        .frame(width: Self.width)
         .frame(minHeight: 440)
         .background(RetroPalette.window)
     }

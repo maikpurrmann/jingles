@@ -2,10 +2,16 @@ import AppKit
 import SwiftUI
 
 private enum JinglesAppearance: String, CaseIterable, Identifiable {
-    case standard, studio
+    case standard, studio, retro
 
     var id: Self { self }
-    var title: String { self == .standard ? "Standard" : "Studio" }
+    var title: String {
+        switch self {
+        case .standard: "Standard"
+        case .studio: "Studio"
+        case .retro: "Retro"
+        }
+    }
 }
 
 private struct AppearancePicker: View {
@@ -29,7 +35,7 @@ struct JinglesApp: App {
     var body: some Scene {
         Window(Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "Jingles", id: "player") {
             JinglesView(player: player, appearance: appearance)
-                .preferredColorScheme(appearance == .studio ? .dark : nil)
+                .preferredColorScheme(appearance == .standard ? nil : .dark)
         }
         .defaultSize(width: 620, height: 470)
         .windowResizability(.contentMinSize)
@@ -70,6 +76,14 @@ private struct JinglesView: View {
     private var isStudio: Bool { appearance == .studio }
 
     var body: some View {
+        if appearance == .retro {
+            RetroPlayerView(player: player)
+        } else {
+            panelBody
+        }
+    }
+
+    private var panelBody: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 8) {
                 if isStudio {
@@ -389,7 +403,7 @@ private struct JinglesView: View {
     }
 }
 
-private struct JinglesInfoView: View {
+struct JinglesInfoView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 4) {
